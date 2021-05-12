@@ -1,4 +1,6 @@
-// Require the client library packages
+//SCRIPT PER PUBBLICAZIONE SU IOTA SENZA MAM
+
+
 const Iota = require('@iota/core');
 const iotaAreaCodes = require('@iota/area-codes');
 const { asciiToTrytes } = require('@iota/converter')
@@ -31,7 +33,7 @@ tag = 'MUXFRXGY9MT'
 
 
 
-if (iotaAreaCodes.isValidPartial(tag) ||  iotaAreaCodes.isValid(tag)) {
+if (iotaAreaCodes.isValidPartial(tag) || iotaAreaCodes.isValid(tag)) {
     console.log("Tag valido")
     console.log("TAG:", tag)
 

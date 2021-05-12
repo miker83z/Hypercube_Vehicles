@@ -30,53 +30,45 @@ console.log('MamState: ', mamState)
 //Change MAM state to previous and change mode
 Mam.changeMode(mamState, mode, secretKey)  ///////MODALITà RESTRICTED
 
-
-
-
-
 // Publish to tangle
 
 const publish = async (packet, tag) => {
-    console.log("tag aggiornato", tag)
-
-
+  
     // Create MAM Payload - STRING OF TRYTES
     const trytes = asciiToTrytes(JSON.stringify(packet))
-    console.log("traystes", trytes)
     const message = Mam.create(mamState, trytes)
 
     // Save new mamState
     mamState = message.state
     //fs.writeFileSync('mam_state.json', JSON.stringify(mamState))
 
-
     // Attach the payload
     await Mam.attach(message.payload, message.address, 3, 9, tag)
-    console.log("TAG:", tag)
+  
 
-    console.log('Published', packet, '\n');
-    console.log('Address', message.address, '\n')
+    //console.log('Published', packet, '\n');
+    //console.log('Address', message.address, '\n')
 
-
+    /*
     if (mamState.channel.start === 1) {
         console.log('\r\nListen to this stream with\n\r\n\r', message.root, '\r\n\r\n')
     } else {
         console.log('\r\nUpdated root: ', message.root, '\r\n')
     }
+    */
 
     return message.root
 }
 
-const execute = async (tag) => {
-    console.log("publish all")
+
+execute = async (tag) => {
     const root = await publish({
-        message: 'segnalazione buca 4', 
+        message: tag,
         timestamp: (new Date()).toLocaleString()
     }, tag);
 
 
     console.log(`Verify with MAM Explorer:\n${mamExplorerLink}${root}\n`)
-    console.log(root)
     return root
 }
 
@@ -105,7 +97,10 @@ const start = async function () {
     //i++ //PER AGGIORNARE AUTOMATICAMENTE LE COORDINATE
     */
 }
-start()
+//start()
 
-
+//execute('MKNSJWGM9QP')
+module.exports = {
+    execute: execute
+};
 

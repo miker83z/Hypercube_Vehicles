@@ -72,28 +72,8 @@ fetchData = async (root) => {
 
 
 
-findLocations = async () => {
+findLocations = async (iac) => {
 
-
-    //MPOVJQVZ9UU MESSINA
-    //var iac = 'MPURPMWW9RV'
-    var iac = 'NPHTQO'
-    /*
-    const isValidPartial1 = iotaAreaCodes.isValidPartial(iac);
-    console.log(isValidPartial1)
-
-    const increasePrecision1 = iotaAreaCodes.increasePrecision(iac);
-    console.log("increasePrecision1", increasePrecision1);
-    const setPrecision1 = iotaAreaCodes.setPrecision(iac, 6);
-    console.log("setPrecision", setPrecision1);
-
-    const decreasePrecision1 = iotaAreaCodes.decreasePrecision(iac);
-    console.log("decreasePrecision1", decreasePrecision1);
-
-    const codeArea = iotaAreaCodes.decode(iac);
-    console.log("IOTA Code Area", codeArea);
-
-    */
 
     console.log('findLocations')
     var locations = [];
@@ -111,8 +91,6 @@ findLocations = async () => {
                         
                         for (i = 0; i < array.length; i++) {
 
-                          
-                         
                             let areaCode = iotaAreaCodes.extract(array[i].tag);
                             //console.log(area)
                             let data = iotaAreaCodes.decode(areaCode);
