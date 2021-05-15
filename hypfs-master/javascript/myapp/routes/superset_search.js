@@ -55,7 +55,6 @@ const make_req = async function (keyword, threshold, callback) {
                 callback(body)
             }
         }
-        console.log(body)
 
     })
 }

@@ -16,19 +16,27 @@
         crossorigin=""></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <script src="./requests.js"></script>
 
 
 </head>
 
 <body>
 
+
+
+
     <div id="map"></div>
     <!--
     <script src="javascripts/webmap.js"></script>
     -->
 
-    <button id="insertBtn" onclick="insert_point()">Insert Point</button>
-    <button id="pinSearchBtn" onclick="superset_search()">Superset Search</button>
+    <button id="insertBtn" onclick="choose_operation('insert')">Insert Point</button>
+    <button id="superSearchBtn" onclick="choose_operation('superset_search')">Superset Search</button>
+    <button id="pinSearchBtn" onclick="choose_operation('pin_search')">Pin Search</button>
+    <button id="removeBtn" onclick="choose_operation('remove')">Remove</button>
+
+
 
 </body>
 
@@ -36,6 +44,7 @@
 </html>
 
 <script>
+
 
 
     //var L = require('leaflet');
@@ -64,40 +73,5 @@
         radius: 50
     }).addTo(mymap);
 
-
-    function insert_point() {
-
-        $.ajax({
-            type: 'POST',
-            url: '/insert',
-            contentType: 'application/json',
-            data: JSON.stringify({ 'keyword': 3, "obj": "51.895890, 61.363030" }),
-            success: function (data) {
-                console.log(data);
-            },
-            error: function (err) {
-                console.log("errore", err)
-            }
-        });
-
-    }
-
-
-    function superset_search() {
-
-        $.ajax({
-            type: 'POST',
-            url: '/superset_search',
-            contentType: 'application/json',
-            data: JSON.stringify({ 'keyword': 3, "threshold": 10 }),
-            success: function (data) {
-                console.log(data)
-            },
-            error: function (err) {
-                console.log(err)
-            }
-        });
-
-    }
 
 </script>

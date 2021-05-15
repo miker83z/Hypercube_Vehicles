@@ -5,5 +5,5 @@ function split_str(string) {
 
     return str_splitted
 }
-
+ 
 module.exports = { split_str };
