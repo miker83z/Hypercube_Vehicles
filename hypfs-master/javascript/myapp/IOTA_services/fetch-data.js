@@ -4,7 +4,7 @@ const iotaAreaCodes = require('@iota/area-codes');
 const Mam = require('@iota/mam')
 const fs = require('fs')
 var mam_setup = require('./mam-setup');
-const { asciiToTrytes, trytesToAscii } = require('@iota/converter');
+const { trytesToAscii } = require('@iota/converter');
 
 
 // Create a new instance of the IOTA object
@@ -49,11 +49,8 @@ fetchData = async (root) => {
     //Fetch data from tangle
     await Mam.fetch(root, mode, secretKey).then(data => {
 
-
-
         for (let i = 0; i < data.messages.length; i++) {
             msg = JSON.parse(trytesToAscii(data.messages[i]))
-
             fetches.push(msg)
         }
 
@@ -64,8 +61,7 @@ fetchData = async (root) => {
     }).catch(err => {
         console.log(err)
     })
-    //return message
-    console.log("msg return", fetches)
+
     return fetches
 
 }
@@ -73,7 +69,6 @@ fetchData = async (root) => {
 
 
 findLocations = async (iac) => {
-
 
     console.log('findLocations')
     var locations = [];
@@ -85,21 +80,21 @@ findLocations = async (iac) => {
                 .then(
                     array => {
                         console.log("length msg", array.length);
-                        datainfo = trytesToAscii(array[0].signatureMessageFragment.slice(0,-1))
+                        datainfo = trytesToAscii(array[0].signatureMessageFragment.slice(0, -1))
                         console.log(datainfo)
-                  
-                        
+
+
                         for (i = 0; i < array.length; i++) {
 
                             let areaCode = iotaAreaCodes.extract(array[i].tag);
                             //console.log(area)
                             let data = iotaAreaCodes.decode(areaCode);
                             locations.push({ "lat": data.latitude, "lng": data.longitude });
-                            const datainfo = trytesToAscii(array[i].signatureMessageFragment.slice(0,-1))
-                        
-            
+                            const datainfo = trytesToAscii(array[i].signatureMessageFragment.slice(0, -1))
+
+
                         }
-                        
+
                         console.log(`${locations.length} transactions found with the ${iac} tag`)
                         console.log(locations)
                     }
@@ -113,12 +108,11 @@ findLocations = async (iac) => {
 
     return locations
 
-    
 }
 
 
-//findLocations()
+
 module.exports = { findLocations, fetchData }
-var channelID = 'PGQWQWKOTCIX9OONLSSOTRUGFCJZQMJJGHCBVFUVODAGQOSUGNWTQOWWKGZAABIWEUAD9WWLZVLMEJRQM'
+//var channelID = 'PGQWQWKOTCIX9OONLSSOTRUGFCJZQMJJGHCBVFUVODAGQOSUGNWTQOWWKGZAABIWEUAD9WWLZVLMEJRQM'
 //fetchData(channelID)
 //findLocations()

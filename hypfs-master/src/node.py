@@ -11,7 +11,8 @@ class Node:
         self.lock = threading.Lock()
 
     def insert(self, keyword, obj):
-        bit_keyword = create_binary_id(keyword) #trasformo il set in vettore binario
+        bit_keyword = create_binary_id(keyword) #trasformo il set di key in vettore binario
+        print("bit_keyword", bit_keyword)
         if bit_keyword == self.id:  #in questo caso se non occupa il nodo stesso
             if obj not in self.objects:
                 with self.lock:

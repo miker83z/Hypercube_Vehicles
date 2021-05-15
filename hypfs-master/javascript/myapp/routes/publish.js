@@ -10,33 +10,39 @@ const iotaAreaCodes = require('@iota/area-codes');
 
 router.post('/insert', async function (req, res) {
 
-  var iac = iotaAreaCodes.encode(50.895379, 60.363030);
+  keyword = req.body.keyword
+  obj = req.body.obj
+  //insert data in MAM
+  var iac = iotaAreaCodes.encode(obj);
+  //TODO: METTERE CONTROLLO IAC
   var root = await execute(iac)
-  console.log("root", root)
+
   //request to DHT
-  await make_req(root)
-  res.send("okay")
+
+  make_req(keyword, root, function (data) {
+    console.log("data", data)
+    res.send(data)
+  })
 });
 
-const make_req = async function (root) {
 
-  console.log("root on req", root)
+const make_req = async function (keyword, root, callback) {
+
   const options = {
     url: 'http://127.0.0.1:50001/insert',
     method: 'GET',
-    qs: { 'keyword': 3, "obj": root },
+    qs: { 'keyword': keyword, "obj": root },
     json: true
   };
 
   request(options, function optionalCallback(err, httpResponse, body) {
-    console.log("request gone")
+
     if (err) {
       return console.error('upload failed:', err);
-
     }
-    console.log('Upload successful!  Server responded with:', body);
+    console.log('Server responded with:', body);
 
-    return body
+    callback(body)
 
   })
 }

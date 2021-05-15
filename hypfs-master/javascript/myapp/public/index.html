@@ -27,7 +27,8 @@
     <script src="javascripts/webmap.js"></script>
     -->
 
-    <button id="mybtn" onclick="insertPoint()">Click me</button>
+    <button id="insertBtn" onclick="insert_point()">Insert Point</button>
+    <button id="pinSearchBtn" onclick="superset_search()">Superset Search</button>
 
 </body>
 
@@ -64,14 +65,31 @@
     }).addTo(mymap);
 
 
-    function insertPoint() {
+    function insert_point() {
 
         $.ajax({
             type: 'POST',
             url: '/insert',
-            dataType: 'json',
             contentType: 'application/json',
-            //data: JSON.stringify({ 'keyword': 1, "obj": "tt" }),
+            data: JSON.stringify({ 'keyword': 3, "obj": "51.895890, 61.363030" }),
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (err) {
+                console.log("errore", err)
+            }
+        });
+
+    }
+
+
+    function superset_search() {
+
+        $.ajax({
+            type: 'POST',
+            url: '/superset_search',
+            contentType: 'application/json',
+            data: JSON.stringify({ 'keyword': 3, "threshold": 10 }),
             success: function (data) {
                 console.log(data)
             },

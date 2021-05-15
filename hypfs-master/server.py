@@ -21,10 +21,9 @@ def request_insert():
     print("argomenti", request)
     print("argomenti", request.args)
     keyword = int(request.args.get('keyword'))
+    print("key int", keyword)
     obj = request.args.get('obj')
-    print("respo0")
     res = NODE.insert(keyword, obj)
-    print("respo", res)
     if type(res) is not str:
         res = res.text
   
@@ -32,16 +31,6 @@ def request_insert():
     #return jsonify(res) #se non scommento quest dà errore lato javascript anche se il file viene inserito
     #return jsonify(({'success':True}), 200, {'ContentType':'application/json'} )
 
-
-@app.route('/test')
-@cross_origin()
-def helloWorld():
-
-    clicked=None
-    print(request.args)
-    if request.method == "POST":
-          clicked=request.json['data']
-    return "Hello, cross-origin-world!"
 
 
 @app.route(REMOVE)

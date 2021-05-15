@@ -15,7 +15,7 @@ function mam_setup() {
 
     // Set channel mode
     mamState = Mam.changeMode(mamState, mode, secretKey)
-    console.log('Initial state: ', mamState)
+    //console.log('Initial state: ', mamState)
 
     //Store MAM state in case system breaks down
     fs.writeFileSync('mam_state.json', JSON.stringify(mamState))
