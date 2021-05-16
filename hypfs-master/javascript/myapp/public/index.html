@@ -16,12 +16,15 @@
         crossorigin=""></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <script src="./requests.js"></script>
+
+
 
 
 </head>
 
 <body>
+
+    <script src="bundle.js"></script>
 
 
 
@@ -35,6 +38,7 @@
     <button id="superSearchBtn" onclick="choose_operation('superset_search')">Superset Search</button>
     <button id="pinSearchBtn" onclick="choose_operation('pin_search')">Pin Search</button>
     <button id="removeBtn" onclick="choose_operation('remove')">Remove</button>
+    <button id="clearBtn" onclick="output_data('clear')">Clear map</button>
 
 
 
@@ -50,7 +54,7 @@
     //var L = require('leaflet');
 
     // Creates a leaflet map binded to an html <div> with id "map
-    var mymap = L.map('map').setView([44.496893, 11.342327], 20);
+    var mymap = L.map('map').setView([44.496893, 11.342327], 14);
 
 
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -62,16 +66,18 @@
         accessToken: 'pk.eyJ1IjoiZmVkZXJpY2EwOTYiLCJhIjoiY2tudTFjNDN6MDhmdjJ1cm1qZGZ4aW15eCJ9.3Pv_3Qn0oSh37OUCDSgWrg'
     }).addTo(mymap);
 
-    var marker = L.marker([44.496893, 11.342327]).addTo(mymap);
+    var layerGroup = L.layerGroup().addTo(mymap);
+    //var marker = L.marker([44.496893, 11.342327]).addTo(layerGroup);
 
 
-    marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+    //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+    /*
     var circle = L.circle([44.496893, 11.342327], {
         color: 'red',
         fillColor: '#f03',
         fillOpacity: 0.5,
         radius: 50
     }).addTo(mymap);
-
+*/
 
 </script>

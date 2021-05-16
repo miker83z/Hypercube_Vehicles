@@ -8,6 +8,8 @@ router.post('/remove', async function (req, res) {
     keyword = req.body.keyword
     root = req.body.obj
 
+    console.log(keyword, root)
+
     const options = {
         url: 'http://127.0.0.1:50001/remove',
         method: 'GET',

@@ -35,8 +35,7 @@ mamState = Mam.changeMode(mamState, mode, secretKey)
 
 //NB: PER RECUPERARE TUTTI I MSG DEVI SCORRERE I ROOT
 fetchData = async (root) => {
-    console.log("fetchData")
-
+    
     mode = mam_setup()[0]
     secretKey = mam_setup()[1]
     provider = mam_setup()[2]

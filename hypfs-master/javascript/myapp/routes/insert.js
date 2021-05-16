@@ -4,23 +4,28 @@ const request = require('request');
 const myModulePublish = require('../IOTA_services/publishMAM');
 const execute = myModulePublish.execute
 const iotaAreaCodes = require('@iota/area-codes');
+const utils = require('../utils')
 
 
 /* POST data into  DHT and MAM */
 
 router.post('/insert', async function (req, res) {
 
-  keyword = req.body.keyword
-  obj = req.body.obj
+
+  keyword = Math.floor(Math.random() * 7) + 1
+  obj = utils.generate_coord()
+  console.log(keyword, obj)
+
   //insert data in MAM
-  var iac = iotaAreaCodes.encode(obj);
+  var iac = iotaAreaCodes.encode(obj.latitude, obj.longitude);
+  console.log("IAC:", iac)
   //TODO: METTERE CONTROLLO IAC
   var root = await execute(iac)
 
   //request to DHT
 
   make_req(keyword, root, function (data) {
-    console.log("data", data)
+
     res.send(data)
   })
 });
