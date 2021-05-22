@@ -1,9 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){(function (){
-const iotaAreaCodes = require('@iota/area-codes');
-
-
-
+///browserify requests.js -o bundle.js 
+var OpenLocationCode = require('open-location-code').OpenLocationCode
 function client_request(url, data, operation) {
 
     $.ajax({
@@ -23,8 +21,8 @@ function client_request(url, data, operation) {
 }
 
 global.choose_operation = function (operation) {
-    var url = "";
-    var data = "";
+    var url;
+    var data;
 
     switch (operation) {
         case "insert":
@@ -35,20 +33,21 @@ global.choose_operation = function (operation) {
             break;
         case "pin_search":
 
+
             url = '/pin_search'
-            data = JSON.stringify({ 'keyword': 2, "threshold": -1 })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": -1 })
 
             break;
         case "superset_search":
 
             url = '/superset_search'
-            data = JSON.stringify({ 'keyword': 4, "threshold": 5 })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": 5 })
             break;
 
         case "remove":
 
             url = '/remove'
-            data = JSON.stringify({ 'keyword': 2, "obj": "DOWOEGCRBXJAN9GTLDHRSDED9BODDMOTMIAOUHER9FSXPKHCMUEURAFWIHAACWRBMWOBMJWCUMAHYEFMU" })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "obj": "JTXBOI9PSLJQUQOEJHULRVHBFDOEFTGXZQZAGS9ZSUGXJTJFFKPN9PIQGWONMJXMIRAKLWIW9YSFICUU9" })
             break;
 
     }
@@ -59,20 +58,18 @@ global.choose_operation = function (operation) {
 
 global.output_data = function (operation, data) {
     console.log(data)
-    var count = 0
+
 
     switch (operation) {
         case "pin_search":
         case "superset_search":
             for (element of data[0]) {
 
-                coord = decodeIAC(element.message)
-                count ++
-                L.marker([coord.latitude, coord.longitude]).addTo(layerGroup);
+                coord = decodeOLC(element.message)
+                console.log(coord)
+                L.marker([coord.latitudeCenter, coord.longitudeCenter]).addTo(layerGroup);
                 //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
-
             }
-            console.log(count)
 
             break;
 
@@ -83,910 +80,737 @@ global.output_data = function (operation, data) {
         default:
             break;
 
-
-
     }
 }
 
-function decodeIAC(IAC_point) {
+function decodeOLC(code) {
 
+    const openLocationCode = new OpenLocationCode();
+    const coord = openLocationCode.decode(code)
+    return coord
 
-    if (iotaAreaCodes.isValid(IAC_point)) {
-        const codeArea = iotaAreaCodes.decode(IAC_point);
-        return codeArea
-    }
 
 }
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"@iota/area-codes":2}],2:[function(require,module,exports){
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = global || self, factory(global.IotaAreaCodes = {}));
-}(this, function (exports) { 'use strict';
+},{"open-location-code":2}],2:[function(require,module,exports){
+// Copyright 2014 Google Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the 'License');
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-    /**
-     * Code precision to use for locations.
-     */
-    var CodePrecision = /** @class */ (function () {
-        function CodePrecision() {
-        }
-        /**
-         * Provides a normal precision code, approximately 14x14 meters.
-         */
-        CodePrecision.NORMAL = 10;
-        /**
-         * Provides an extra precision code, approximately 2x3 meters.
-         */
-        CodePrecision.EXTRA = 11;
-        return CodePrecision;
-    }());
+/**
+  Convert locations to and from short codes.
 
-    function unwrapExports (x) {
-    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+  Open Location Codes are short, 10-11 character codes that can be used instead
+  of street addresses. The codes can be generated and decoded offline, and use
+  a reduced character set that minimises the chance of codes including words.
+
+  Codes are able to be shortened relative to a nearby location. This means that
+  in many cases, only four to seven characters of the code are needed.
+  To recover the original code, the same location is not required, as long as
+  a nearby location is provided.
+
+  Codes represent rectangular areas rather than points, and the longer the
+  code, the smaller the area. A 10 character code represents a 13.5x13.5
+  meter area (at the equator. An 11 character code represents approximately
+  a 2.8x3.5 meter area.
+
+  Two encoding algorithms are used. The first 10 characters are pairs of
+  characters, one for latitude and one for latitude, using base 20. Each pair
+  reduces the area of the code by a factor of 400. Only even code lengths are
+  sensible, since an odd-numbered length would have sides in a ratio of 20:1.
+
+  At position 11, the algorithm changes so that each character selects one
+  position from a 4x5 grid. This allows single-character refinements.
+
+  Examples:
+  
+  var OpenLocationCode = require('open-location-code').OpenLocationCode;
+	var openLocationCode = new OpenLocationCode();
+  
+  // Encode a location, default accuracy:
+	var code = openLocationCode.encode(47.365590, 8.524997);
+	console.log(code);
+  
+  // Encode a location using one stage of additional refinement:
+  code = openLocationCode.encode(47.365590, 8.524997, 11);
+  console.log(code);
+  
+  //Decode a full code:
+	var coord = openLocationCode.decode(code);
+  var msg = 'Center is ' + coord.latitudeCenter + ',' + coord.longitudeCenter;
+	console.log(msg);
+   
+  // Attempt to trim the first characters from a code:
+	var shortCode = openLocationCode.shorten('8FVC9G8F+6X', 47.5, 8.5);
+	console.log(shortCode);
+
+  // Recover the full code from a short code:
+  var nearestCode = openLocationCode.recoverNearest('9G8F+6X', 47.4, 8.6);
+	console.log(nearestCode);
+  nearestCode = openLocationCode.recoverNearest('8F+6X', 47.4, 8.6);
+  console.log(nearestCode);
+    
+ */
+
+ 
+var OpenLocationCode = function () {};
+
+  // A separator used to break the code into two parts to aid memorability.
+  var SEPARATOR_ = '+';
+
+  // The number of characters to place before the separator.
+  var SEPARATOR_POSITION_ = 8;
+
+  // The character used to pad codes.
+  var PADDING_CHARACTER_ = '0';
+
+  // The character set used to encode the values.
+  var CODE_ALPHABET_ = '23456789CFGHJMPQRVWX';
+
+  // The base to use to convert numbers to/from.
+  var ENCODING_BASE_ = CODE_ALPHABET_.length;
+
+  // The maximum value for latitude in degrees.
+  var LATITUDE_MAX_ = 90;
+
+  // The maximum value for longitude in degrees.
+  var LONGITUDE_MAX_ = 180;
+
+  // Maxiumum code length using lat/lng pair encoding. The area of such a
+  // code is approximately 13x13 meters (at the equator), and should be suitable
+  // for identifying buildings. This excludes prefix and separator characters.
+  var PAIR_CODE_LENGTH_ = 10;
+
+  // The resolution values in degrees for each position in the lat/lng pair
+  // encoding. These give the place value of each position, and therefore the
+  // dimensions of the resulting area.
+  var PAIR_RESOLUTIONS_ = [20.0, 1.0, .05, .0025, .000125];
+
+  // Number of columns in the grid refinement method.
+  var GRID_COLUMNS_ = 4;
+
+  // Number of rows in the grid refinement method.
+  var GRID_ROWS_ = 5;
+
+  // Size of the initial grid in degrees.
+  var GRID_SIZE_DEGREES_ = 0.000125;
+
+  // Minimum length of a code that can be shortened.
+  var MIN_TRIMMABLE_CODE_LEN_ = 6;
+
+  /**
+    Determines if a code is valid.
+
+    To be valid, all characters must be from the Open Location Code character
+    set with at most one separator. The separator can be in any even-numbered
+    position up to the eighth digit.
+   */
+  OpenLocationCode.prototype.isValid = function(code) {
+    if (!code) {
+      return false;
     }
-
-    function createCommonjsModule(fn, module) {
-    	return module = { exports: {} }, fn(module, module.exports), module.exports;
+    // The separator is required.
+    if (code.indexOf(SEPARATOR_) == -1) {
+      return false;
     }
-
-    var openLocationCode = createCommonjsModule(function (module, exports) {
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const LATITUDE_MAX = 90;
-    const LONGITUDE_MAX = 180;
-    /**
-     * Coordinates of a decoded Open Location Code.
-     *
-     * The coordinates include the latitude and longitude of the lower left and
-     * upper right corners and the center of the bounding box for the area the
-     * code represents.
-     *
-     * @constructor
-     */
-    class CodeArea {
-        constructor(latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
-            this.latitudeLo = latitudeLo;
-            this.longitudeLo = longitudeLo;
-            this.latitudeHi = latitudeHi;
-            this.longitudeHi = longitudeHi;
-            this.codeLength = codeLength;
-            this.latitudeCenter = Math.min(latitudeLo + (latitudeHi - latitudeLo) / 2, LATITUDE_MAX);
-            this.longitudeCenter = Math.min(longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX);
-        }
-        getLatitudeHeight() {
-            return this.latitudeHi - this.latitudeLo;
-        }
-        getLongitudeWidth() {
-            return this.longitudeHi - this.longitudeLo;
-        }
+    if (code.indexOf(SEPARATOR_) != code.lastIndexOf(SEPARATOR_)) {
+      return false;
     }
-    exports.CodeArea = CodeArea;
-    /**
-     * Open Location Code implementation for TypeScript
-     */
-    class OpenLocationCode {
-        constructor(code) {
-            this.code = code;
-        }
-        getCode() {
-            return this.code;
-        }
-        /**
-         * Returns whether this {@link OpenLocationCode} is a padded Open Location Code, meaning that it
-         * contains less than 8 valid digits.
-         */
-        isPadded() {
-            return this.code.indexOf(OpenLocationCode.PADDING_CHARACTER_) >= 0;
-        }
-        /**
-         * Determines if a code is valid.
-         *
-         * To be valid, all characters must be from the Open Location Code character
-         * set with at most one separator. The separator can be in any even-numbered
-         * position up to the eighth digit.
-         *
-         * @param {string} code The string to check.
-         * @return {boolean} True if the string is a valid code.
-         */
-        static isValid(code) {
-            if (!code) {
-                return false;
-            }
-            // The separator is required.
-            if (code.indexOf(OpenLocationCode.SEPARATOR_) === -1) {
-                return false;
-            }
-            if (code.indexOf(OpenLocationCode.SEPARATOR_) !== code.lastIndexOf(OpenLocationCode.SEPARATOR_)) {
-                return false;
-            }
-            // Is it the only character?
-            if (code.length === 1) {
-                return false;
-            }
-            // Is it in an illegal position?
-            if (code.indexOf(OpenLocationCode.SEPARATOR_) > OpenLocationCode.SEPARATOR_POSITION_ ||
-                code.indexOf(OpenLocationCode.SEPARATOR_) % 2 === 1) {
-                return false;
-            }
-            // We can have an even number of padding characters before the separator,
-            // but then it must be the final character.
-            if (code.indexOf(OpenLocationCode.PADDING_CHARACTER_) > -1) {
-                // Not allowed to start with them!
-                if (code.indexOf(OpenLocationCode.PADDING_CHARACTER_) === 0) {
-                    return false;
-                }
-                // There can only be one group and it must have even length.
-                const padMatch = code.match(new RegExp("(" + OpenLocationCode.PADDING_CHARACTER_ + "+)", "g"));
-                if (padMatch.length > 1 || padMatch[0].length % 2 === 1 ||
-                    padMatch[0].length > OpenLocationCode.SEPARATOR_POSITION_ - 2) {
-                    return false;
-                }
-                // If the code is long enough to end with a separator, make sure it does.
-                if (code.charAt(code.length - 1) !== OpenLocationCode.SEPARATOR_) {
-                    return false;
-                }
-            }
-            // If there are characters after the separator, make sure there isn't just
-            // one of them (not legal).
-            if (code.length - code.indexOf(OpenLocationCode.SEPARATOR_) - 1 === 1) {
-                return false;
-            }
-            // Strip the separator and any padding characters.
-            const strippedCode = code.replace(new RegExp("\\" + OpenLocationCode.SEPARATOR_ + "+"), "")
-                .replace(new RegExp(OpenLocationCode.PADDING_CHARACTER_ + "+"), "");
-            // Check the code contains only valid characters.
-            for (let i = 0, len = strippedCode.length; i < len; i++) {
-                const character = strippedCode.charAt(i).toUpperCase();
-                if (character !== OpenLocationCode.SEPARATOR_ && OpenLocationCode.CODE_ALPHABET_.indexOf(character) === -1) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        ;
-        /**
-         * Returns whether the provided Open Location Code is a padded Open Location Code, meaning that it
-         * contains less than 8 valid digits.
-         */
-        static isPadded(code) {
-            return new OpenLocationCode(code).isPadded();
-        }
-        /**
-         * Determines if a code is a valid short code.
-         *
-         * @param {string} code The string to check.
-         * @return {boolean} True if the string can be produced by removing four or
-         *     more characters from the start of a valid code.
-         */
-        static isShort(code) {
-            if (!OpenLocationCode.isValid(code)) {
-                return false;
-            }
-            // If there are less characters than expected before the SEPARATOR.
-            return code.indexOf(OpenLocationCode.SEPARATOR_) >= 0 && code.indexOf(OpenLocationCode.SEPARATOR_) < OpenLocationCode.SEPARATOR_POSITION_;
-        }
-        ;
-        /**
-         * Determines if a code is a valid full Open Location Code.
-         *
-         * @param {string} code The string to check.
-         * @return {boolean} True if the code represents a valid latitude and longitude combination.
-         */
-        static isFull(code) {
-            if (!OpenLocationCode.isValid(code)) {
-                return false;
-            }
-            // If it's short, it's not full.
-            if (OpenLocationCode.isShort(code)) {
-                return false;
-            }
-            // Work out what the first latitude character indicates for latitude.
-            const firstLatValue = OpenLocationCode.CODE_ALPHABET_.indexOf(code.charAt(0).toUpperCase()) * OpenLocationCode.ENCODING_BASE_;
-            if (firstLatValue >= OpenLocationCode.LATITUDE_MAX_ * 2) {
-                return false; // The code would decode to a latitude of >= 90 degrees.
-            }
-            if (code.length > 1) {
-                // Work out what the first longitude character indicates for longitude.
-                const firstLngValue = OpenLocationCode.CODE_ALPHABET_.indexOf(code.charAt(1).toUpperCase()) * OpenLocationCode.ENCODING_BASE_;
-                if (firstLngValue >= OpenLocationCode.LONGITUDE_MAX_ * 2) {
-                    return false; // The code would decode to a longitude of >= 180 degrees.
-                }
-            }
-            return true;
-        }
-        ;
-        contains(latitude, longitude) {
-            const codeArea = OpenLocationCode.decode(this.getCode());
-            return codeArea.latitudeLo <= latitude
-                && latitude < codeArea.latitudeHi
-                && codeArea.longitudeLo <= longitude
-                && longitude < codeArea.longitudeHi;
-        }
-        /**
-         * Encode a location into an Open Location Code.
-         *
-         * @param {number} latitude The latitude in signed decimal degrees. It will
-         *     be clipped to the range -90 to 90.
-         * @param {number} longitude The longitude in signed decimal degrees. Will be
-         *     normalised to the range -180 to 180.
-         * @param {?number} codeLength The length of the code to generate. If
-         *     omitted, the value OpenLocationCode.CODE_PRECISION_NORMAL will be used.
-         *     For a more precise result, OpenLocationCode.CODE_PRECISION_EXTRA is
-         *     recommended.
-         * @return {string} The code.
-         * @throws {Exception} if any of the input values are not numbers.
-         */
-        static encode(latitude, longitude, codeLength = OpenLocationCode.CODE_PRECISION_NORMAL) {
-            if (codeLength < 2 || (codeLength < OpenLocationCode.PAIR_CODE_LENGTH_ && codeLength % 2 === 1)) {
-                throw new Error("IllegalArgumentException: Invalid Open Location Code length");
-            }
-            codeLength = Math.min(OpenLocationCode.MAX_DIGIT_COUNT, codeLength);
-            // Ensure that latitude and longitude are valid.
-            let clippedLatitude = OpenLocationCode.clipLatitude(latitude);
-            const clippedLongitude = OpenLocationCode.normalizeLongitude(longitude);
-            // Latitude 90 needs to be adjusted to be just less, so the returned code
-            // can also be decoded.
-            if (clippedLatitude === 90) {
-                clippedLatitude = clippedLatitude - OpenLocationCode.computeLatitudePrecision(codeLength);
-            }
-            let code = OpenLocationCode.encodePairs(clippedLatitude, clippedLongitude, Math.min(codeLength, OpenLocationCode.PAIR_CODE_LENGTH_));
-            // If the requested length indicates we want grid refined codes.
-            if (codeLength > OpenLocationCode.PAIR_CODE_LENGTH_) {
-                code += OpenLocationCode.encodeGrid(clippedLatitude, clippedLongitude, codeLength - OpenLocationCode.PAIR_CODE_LENGTH_);
-            }
-            return code;
-        }
-        ;
-        /**
-         * Decodes an Open Location Code into its location coordinates.
-         *
-         * Returns a CodeArea object that includes the coordinates of the bounding
-         * box - the lower left, center and upper right.
-         *
-         * @param {string} code The code to decode.
-         * @return {CodeArea} An object with the coordinates of the
-         *     area of the code.
-         * @throws {Exception} If the code is not valid.
-         */
-        static decode(code) {
-            if (!OpenLocationCode.isFull(code)) {
-                throw new Error("IllegalArgumentException: Passed Open Location Code is not a valid full code: " + code);
-            }
-            // Strip out separator character (we've already established the code is
-            // valid so the maximum is one), padding characters and convert to upper
-            // case.
-            let editedCode = code.replace(OpenLocationCode.SEPARATOR_, "");
-            editedCode = editedCode.replace(new RegExp(OpenLocationCode.PADDING_CHARACTER_ + "+"), "");
-            editedCode = editedCode.toUpperCase();
-            const codeArea = OpenLocationCode.decodePairs(editedCode.substring(0, OpenLocationCode.PAIR_CODE_LENGTH_)); // Decode the lat/lng pair component.
-            if (editedCode.length <= OpenLocationCode.PAIR_CODE_LENGTH_) {
-                return codeArea; // If there is a grid refinement component, decode that.
-            }
-            const gridArea = OpenLocationCode.decodeGrid(editedCode.substring(OpenLocationCode.PAIR_CODE_LENGTH_, OpenLocationCode.MAX_DIGIT_COUNT));
-            return new CodeArea(codeArea.latitudeLo + gridArea.latitudeLo, codeArea.longitudeLo + gridArea.longitudeLo, codeArea.latitudeLo + gridArea.latitudeHi, codeArea.longitudeLo + gridArea.longitudeHi, codeArea.codeLength + gridArea.codeLength);
-        }
-        ;
-        /**
-         * Recover the nearest matching code to a specified location.
-         *
-         * Given a valid short Open Location Code this recovers the nearest matching
-         * full code to the specified location.
-         *
-         * @param {string} shortCode A valid short code.
-         * @param {number} latitude The latitude to use for the reference
-         *     location.
-         * @param {number} longitude The longitude to use for the reference
-         *     location.
-         * @return {string} The nearest matching full code to the reference location.
-         * @throws {Exception} if the short code is not valid, or the reference
-         *     position values are not numbers.
-         */
-        static recoverNearest(shortCode, latitude, longitude) {
-            if (!OpenLocationCode.isShort(shortCode)) {
-                if (OpenLocationCode.isFull(shortCode)) {
-                    return shortCode;
-                }
-                else {
-                    throw new Error("ValueError: Passed short code is not valid: " + shortCode);
-                }
-            }
-            const referenceLatitude = OpenLocationCode.clipLatitude(latitude);
-            const referenceLongitude = OpenLocationCode.normalizeLongitude(longitude);
-            const shortCodeUpper = shortCode.toUpperCase(); // Clean up the passed code.
-            // Compute the number of digits we need to recover.
-            const paddingLength = OpenLocationCode.SEPARATOR_POSITION_ - shortCodeUpper.indexOf(OpenLocationCode.SEPARATOR_);
-            const resolution = Math.pow(20, 2 - (paddingLength / 2)); // The resolution (height and width) of the padded area in degrees.
-            const halfResolution = resolution / 2.0; // Distance from the center to an edge (in degrees).
-            // Use the reference location to pad the supplied short code and decode it.
-            const codeArea = OpenLocationCode.decode(OpenLocationCode.encode(referenceLatitude, referenceLongitude).substr(0, paddingLength) + shortCodeUpper);
-            // How many degrees latitude is the code from the reference? If it is more
-            // than half the resolution, we need to move it north or south but keep it
-            // within -90 to 90 degrees.
-            if (referenceLatitude + halfResolution < codeArea.latitudeCenter && codeArea.latitudeCenter - resolution >= -OpenLocationCode.LATITUDE_MAX_) {
-                // If the proposed code is more than half a cell north of the reference location,
-                // it's too far, and the best match will be one cell south.
-                codeArea.latitudeCenter -= resolution;
-            }
-            else if (referenceLatitude - halfResolution > codeArea.latitudeCenter &&
-                codeArea.latitudeCenter + resolution <= OpenLocationCode.LATITUDE_MAX_) {
-                // If the proposed code is more than half a cell south of the reference location,
-                // it's too far, and the best match will be one cell north.
-                codeArea.latitudeCenter += resolution;
-            }
-            // How many degrees longitude is the code from the reference?
-            if (referenceLongitude + halfResolution < codeArea.longitudeCenter) {
-                codeArea.longitudeCenter -= resolution;
-            }
-            else if (referenceLongitude - halfResolution > codeArea.longitudeCenter) {
-                codeArea.longitudeCenter += resolution;
-            }
-            return OpenLocationCode.encode(codeArea.latitudeCenter, codeArea.longitudeCenter, codeArea.codeLength);
-        }
-        ;
-        /**
-         * Remove characters from the start of an OLC code.
-         *
-         * This uses a reference location to determine how many initial characters
-         * can be removed from the OLC code. The number of characters that can be
-         * removed depends on the distance between the code center and the reference
-         * location.
-         *
-         * @param {string} code The full code to shorten.
-         * @param {number} latitude The latitude to use for the reference location.
-         * @param {number} longitude The longitude to use for the reference location.
-         * @return {string} The code, shortened as much as possible that it is still
-         *     the closest matching code to the reference location.
-         * @throws {Exception} if the passed code is not a valid full code or the
-         *     reference location values are not numbers.
-         */
-        static shorten(code, latitude, longitude) {
-            if (!OpenLocationCode.isFull(code)) {
-                throw new Error("ValueError: Passed code is not valid and full: " + code);
-            }
-            if (code.indexOf(OpenLocationCode.PADDING_CHARACTER_) !== -1) {
-                throw new Error("ValueError: Cannot shorten padded codes: " + code);
-            }
-            const codeUpper = code.toUpperCase();
-            const codeArea = OpenLocationCode.decode(codeUpper);
-            if (codeArea.codeLength < OpenLocationCode.MIN_TRIMMABLE_CODE_LEN_) {
-                throw new Error("ValueError: Code length must be at least " + OpenLocationCode.MIN_TRIMMABLE_CODE_LEN_);
-            }
-            const latitudeClipped = OpenLocationCode.clipLatitude(latitude);
-            const longitudeClipped = OpenLocationCode.normalizeLongitude(longitude);
-            // How close are the latitude and longitude to the code center.
-            const range = Math.max(Math.abs(codeArea.latitudeCenter - latitudeClipped), Math.abs(codeArea.longitudeCenter - longitudeClipped));
-            for (let i = OpenLocationCode.PAIR_RESOLUTIONS_.length - 2; i >= 1; i--) {
-                // Check if we're close enough to shorten. The range must be less than 1/2
-                // the resolution to shorten at all, and we want to allow some safety, so
-                // use 0.3 instead of 0.5 as a multiplier.
-                if (range < (OpenLocationCode.PAIR_RESOLUTIONS_[i] * 0.3)) {
-                    // Trim it.
-                    return codeUpper.substring((i + 1) * 2);
-                }
-            }
-            return codeUpper;
-        }
-        ;
-        /**
-         * Clip a latitude into the range -90 to 90.
-         *
-         * @param {number} latitude
-         * @return {number} The latitude value clipped to be in the range.
-         */
-        static clipLatitude(latitude) {
-            return Math.min(90, Math.max(-90, latitude));
-        }
-        ;
-        /**
-         * Compute the latitude precision value for a given code length.
-         * Lengths <= 10 have the same precision for latitude and longitude, but
-         * lengths > 10 have different precisions due to the grid method having
-         * fewer columns than rows.
-         * @param {number} codeLength
-         * @return {number} The latitude precision in degrees.
-         */
-        static computeLatitudePrecision(codeLength) {
-            if (codeLength <= 10) {
-                return Math.pow(20, Math.floor(codeLength / -2 + 2));
-            }
-            return Math.pow(20, -3) / Math.pow(OpenLocationCode.GRID_ROWS_, codeLength - 10);
-        }
-        ;
-        /**
-         * Normalize a longitude into the range -180 to 180, not including 180.
-         *
-         * @param {number} longitude
-         * @return {number} Normalized into the range -180 to 180.
-         */
-        static normalizeLongitude(longitude) {
-            let longitudeOutput = longitude;
-            while (longitudeOutput < -180) {
-                longitudeOutput = longitudeOutput + 360;
-            }
-            while (longitudeOutput >= 180) {
-                longitudeOutput = longitudeOutput - 360;
-            }
-            return longitudeOutput;
-        }
-        ;
-        /**
-         * Encode a location into a sequence of OLC lat/lng pairs.
-         *
-         * This uses pairs of characters (longitude and latitude in that order) to
-         * represent each step in a 20x20 grid. Each code, therefore, has 1/400th
-         * the area of the previous code.
-         *
-         * This algorithm is used up to 10 digits.
-         *
-         * @param {number} latitude The location to encode.
-         * @param {number} longitude The location to encode.
-         * @param {number} codeLength Requested code length.
-         * @return {string} The up to 10-digit OLC code for the location.
-         */
-        static encodePairs(latitude, longitude, codeLength) {
-            let code = "";
-            // Adjust latitude and longitude so they fall into positive ranges.
-            let adjustedLatitude = latitude + OpenLocationCode.LATITUDE_MAX_;
-            let adjustedLongitude = longitude + OpenLocationCode.LONGITUDE_MAX_;
-            // Count digits - can't use string length because it may include a separator
-            // character.
-            let digitCount = 0;
-            while (digitCount < codeLength) {
-                // Provides the value of digits in this place in decimal degrees.
-                const placeValue = OpenLocationCode.PAIR_RESOLUTIONS_[Math.floor(digitCount / 2)];
-                // Do the latitude - gets the digit for this place and subtracts that for
-                // the next digit.
-                let digitValue = Math.floor(adjustedLatitude / placeValue);
-                adjustedLatitude -= digitValue * placeValue;
-                code += OpenLocationCode.CODE_ALPHABET_.charAt(digitValue);
-                digitCount += 1;
-                // And do the longitude - gets the digit for this place and subtracts that
-                // for the next digit.
-                digitValue = Math.floor(adjustedLongitude / placeValue);
-                adjustedLongitude -= digitValue * placeValue;
-                code += OpenLocationCode.CODE_ALPHABET_.charAt(digitValue);
-                digitCount += 1;
-                // Should we add a separator here?
-                if (digitCount === OpenLocationCode.SEPARATOR_POSITION_ && digitCount < codeLength) {
-                    code += OpenLocationCode.SEPARATOR_;
-                }
-            }
-            if (code.length < OpenLocationCode.SEPARATOR_POSITION_) {
-                code = code + Array(OpenLocationCode.SEPARATOR_POSITION_ - code.length + 1).join(OpenLocationCode.PADDING_CHARACTER_);
-            }
-            if (code.length === OpenLocationCode.SEPARATOR_POSITION_) {
-                code = code + OpenLocationCode.SEPARATOR_;
-            }
-            return code;
-        }
-        ;
-        /**
-         * Encode a location using the grid refinement method into an OLC string.
-         *
-         * The grid refinement method divides the area into a grid of 4x5, and uses a
-         * single character to refine the area. This allows default accuracy OLC codes
-         * to be refined with just a single character.
-         *
-         * This algorithm is used for codes longer than 10 digits.
-         *
-         * @param {number} latitude The location to encode.
-         * @param {number} longitude The location to encode.
-         * @param {number} codeLength Requested code length.
-         * @return {string} The OLC code digits from the 11th digit on.
-         */
-        static encodeGrid(latitude, longitude, codeLength) {
-            let code = "";
-            let latPlaceValue = OpenLocationCode.GRID_SIZE_DEGREES_;
-            let lngPlaceValue = OpenLocationCode.GRID_SIZE_DEGREES_;
-            // Adjust latitude and longitude so they fall into positive ranges and
-            // get the offset for the required places.
-            let lat = latitude + OpenLocationCode.LATITUDE_MAX_;
-            let lon = longitude + OpenLocationCode.LONGITUDE_MAX_;
-            // To avoid problems with floating point, get rid of the degrees.
-            lat = lat % 1.0;
-            lon = lon % 1.0;
-            let adjustedLatitude = lat % latPlaceValue;
-            let adjustedLongitude = lon % lngPlaceValue;
-            for (let i = 0; i < codeLength; i++) {
-                // Work out the row and column.
-                const row = Math.floor(adjustedLatitude / (latPlaceValue / OpenLocationCode.GRID_ROWS_));
-                const col = Math.floor(adjustedLongitude / (lngPlaceValue / OpenLocationCode.GRID_COLUMNS_));
-                latPlaceValue /= OpenLocationCode.GRID_ROWS_;
-                lngPlaceValue /= OpenLocationCode.GRID_COLUMNS_;
-                adjustedLatitude -= row * latPlaceValue;
-                adjustedLongitude -= col * lngPlaceValue;
-                code += OpenLocationCode.CODE_ALPHABET_.charAt(row * OpenLocationCode.GRID_COLUMNS_ + col);
-            }
-            return code;
-        }
-        ;
-        /**
-         * Decode an OLC code made up of lat/lng pairs.
-         *
-         * This decodes an OLC code made up of alternating latitude and longitude
-         * characters, encoded using base 20.
-         *
-         * @param {string} code The code to decode, assumed to be a valid full code,
-         *     but with the separator removed.
-         * @return {CodeArea} The code area object.
-         */
-        static decodePairs(code) {
-            // Get the latitude and longitude values. These will need correcting from
-            // positive ranges.
-            const latitude = OpenLocationCode.decodePairsSequence(code, 0);
-            const longitude = OpenLocationCode.decodePairsSequence(code, 1);
-            // Correct the values and set them into the CodeArea object.
-            return new CodeArea(latitude[0] - OpenLocationCode.LATITUDE_MAX_, longitude[0] - OpenLocationCode.LONGITUDE_MAX_, latitude[1] - OpenLocationCode.LATITUDE_MAX_, longitude[1] - OpenLocationCode.LONGITUDE_MAX_, code.length);
-        }
-        ;
-        /**
-         * Decode either a latitude or longitude sequence.
-         *
-         * This decodes the latitude or longitude sequence of a lat/lng pair encoding.
-         * Starting at the character at position offset, every second character is
-         * decoded and the value returned.
-         *
-         * @param {string} code A valid full OLC code, with the separator removed.
-         * @param {number} offset The character to start from.
-         * @return {[number]} An array of two numbers, representing the lower and
-         *     upper range in decimal degrees. These are in positive ranges and will
-         *     need to be corrected appropriately.
-         */
-        static decodePairsSequence(code, offset) {
-            let i = 0;
-            let value = 0;
-            while (i * 2 + offset < code.length) {
-                value += OpenLocationCode.CODE_ALPHABET_.indexOf(code.charAt(i * 2 + offset)) * OpenLocationCode.PAIR_RESOLUTIONS_[i];
-                i += 1;
-            }
-            return [value, value + OpenLocationCode.PAIR_RESOLUTIONS_[i - 1]];
-        }
-        ;
-        /**
-         * Decode the grid refinement portion of an OLC code.
-         *
-         * @param {string} code The grid refinement section of a code.
-         * @return {CodeArea} The area of the code.
-         */
-        static decodeGrid(code) {
-            let latitudeLo = 0.0;
-            let longitudeLo = 0.0;
-            let latPlaceValue = OpenLocationCode.GRID_SIZE_DEGREES_;
-            let lngPlaceValue = OpenLocationCode.GRID_SIZE_DEGREES_;
-            let i = 0;
-            while (i < code.length) {
-                const codeIndex = OpenLocationCode.CODE_ALPHABET_.indexOf(code.charAt(i));
-                const row = Math.floor(codeIndex / OpenLocationCode.GRID_COLUMNS_);
-                const col = codeIndex % OpenLocationCode.GRID_COLUMNS_;
-                latPlaceValue /= OpenLocationCode.GRID_ROWS_;
-                lngPlaceValue /= OpenLocationCode.GRID_COLUMNS_;
-                latitudeLo += row * latPlaceValue;
-                longitudeLo += col * lngPlaceValue;
-                i += 1;
-            }
-            return new CodeArea(latitudeLo, longitudeLo, latitudeLo + latPlaceValue, longitudeLo + lngPlaceValue, code.length);
-        }
-        ;
+    // Is it the only character?
+    if (code.length == 1) {
+      return false;
     }
-    OpenLocationCode.CODE_PRECISION_NORMAL = 10;
-    OpenLocationCode.CODE_PRECISION_EXTRA = 11;
-    OpenLocationCode.MAX_DIGIT_COUNT = 15;
-    // A separator used to break the code into two parts to aid memorability.
-    OpenLocationCode.SEPARATOR_ = "+";
-    // The number of characters to place before the separator.
-    OpenLocationCode.SEPARATOR_POSITION_ = 8;
-    // The character used to pad codes.
-    OpenLocationCode.PADDING_CHARACTER_ = "0";
-    // The character set used to encode the values.
-    OpenLocationCode.CODE_ALPHABET_ = "23456789CFGHJMPQRVWX";
-    // The base to use to convert numbers to/from.
-    OpenLocationCode.ENCODING_BASE_ = OpenLocationCode.CODE_ALPHABET_.length;
-    // The maximum value for latitude in degrees.
-    OpenLocationCode.LATITUDE_MAX_ = LATITUDE_MAX;
-    // The maximum value for longitude in degrees.
-    OpenLocationCode.LONGITUDE_MAX_ = LONGITUDE_MAX;
-    // Maximum code length using lat/lng pair encoding. The area of such a
-    // code is approximately 13x13 meters (at the equator), and should be suitable
-    // for identifying buildings. This excludes prefix and separator characters.
-    OpenLocationCode.PAIR_CODE_LENGTH_ = 10;
-    // The resolution values in degrees for each position in the lat/lng pair
-    // encoding. These give the place value of each position, and therefore the
-    // dimensions of the resulting area.
-    OpenLocationCode.PAIR_RESOLUTIONS_ = [20.0, 1.0, .05, .0025, .000125];
-    // Number of columns in the grid refinement method.
-    OpenLocationCode.GRID_COLUMNS_ = 4;
-    // Number of rows in the grid refinement method.
-    OpenLocationCode.GRID_ROWS_ = 5;
-    // Size of the initial grid in degrees.
-    OpenLocationCode.GRID_SIZE_DEGREES_ = 0.000125;
-    // Minimum length of a code that can be shortened.
-    OpenLocationCode.MIN_TRIMMABLE_CODE_LEN_ = 6;
-    exports.default = OpenLocationCode;
-
-    });
-
-    var OpenLocationCode = unwrapExports(openLocationCode);
-    var openLocationCode_1 = openLocationCode.CodeArea;
-
-    /**
-     * The character set used in Open Location Code encoding.
-     * @private
-     */
-    var OLC_APHABET = "23456789CFGHJMPQRVWX0+";
-    /**
-     * The character set used in IOTA Area Code encoding.
-     * @private
-     */
-    var IAC_APHABET = "FGHJKLMNOPQRSTUVXWYZA9";
-
-    /**
-     * Convert the IOTA Area Code to Open Location Code with no validation.
-     * @private
-     * @param iotaAreaCode The IOTA Area Code to convert.
-     * @returns The Open Location Code.
-     */
-    function iacToOlcInternal(iotaAreaCode) {
-        var olc = "";
-        for (var i = 0; i < iotaAreaCode.length; i++) {
-            var idx = IAC_APHABET.indexOf(iotaAreaCode[i]);
-            olc += OLC_APHABET[idx];
-        }
-        return olc;
+    // Is it in an illegal position?
+    if (code.indexOf(SEPARATOR_) > SEPARATOR_POSITION_ ||
+        code.indexOf(SEPARATOR_) % 2 == 1) {
+      return false;
+    }
+    // We can have an even number of padding characters before the separator,
+    // but then it must be the final character.
+    if (code.indexOf(PADDING_CHARACTER_) > -1) {
+      // Not allowed to start with them!
+      if (code.indexOf(PADDING_CHARACTER_) == 0) {
+        return false;
+      }
+      // There can only be one group and it must have even length.
+      var padMatch = code.match(new RegExp('(' + PADDING_CHARACTER_ + '+)', 'g'));
+      if (padMatch.length > 1 || padMatch[0].length % 2 == 1 ||
+          padMatch[0].length > SEPARATOR_POSITION_ - 2) {
+        return false;
+      }
+      // If the code is long enough to end with a separator, make sure it does.
+      if (code.charAt(code.length - 1) != SEPARATOR_) {
+        return false;
+      }
+    }
+    // If there are characters after the separator, make sure there isn't just
+    // one of them (not legal).
+    if (code.length - code.indexOf(SEPARATOR_) - 1 == 1) {
+      return false;
     }
 
-    /**
-     * Is the IOTA Area Code valid.
-     * @param iotaAreaCode The IOTA Area Code to validate.
-     * @returns True if the code is valid.
-     */
-    function isValid(iotaAreaCode) {
-        // Check if all the characters fall within our alphabet
-        var re = new RegExp("^[" + IAC_APHABET + "]*$");
-        var codeIsValid = re.test(iotaAreaCode);
-        if (codeIsValid) {
-            // Now validate using OLC validation
-            codeIsValid = OpenLocationCode.isFull(iacToOlcInternal(iotaAreaCode));
-        }
-        return codeIsValid;
+    // Strip the separator and any padding characters.
+    code = code.replace(new RegExp('\\' + SEPARATOR_ + '+'), '')
+        .replace(new RegExp(PADDING_CHARACTER_ + '+'), '');
+    // Check the code contains only valid characters.
+    for (var i = 0, len = code.length; i < len; i++) {
+      var character = code.charAt(i).toUpperCase();
+      if (character != SEPARATOR_ && CODE_ALPHABET_.indexOf(character) == -1) {
+        return false;
+      }
     }
-    /**
-     * Is the IOTA Area Code a valid partial code.
-     * @param iotaAreaCode The IOTA Area Code to validate.
-     * @returns True if the code is a partial.
-     */
-    function isValidPartial(iotaAreaCode) {
-        if (iotaAreaCode === undefined || iotaAreaCode === null || typeof iotaAreaCode !== "string" || iotaAreaCode.length > 9) {
-            return false;
-        }
-        else {
-            if (!iotaAreaCode.endsWith("AA9")) {
-                return false;
-            }
-            else {
-                var remaining = iotaAreaCode.replace(/A*9$/, "");
-                if (remaining.length < 2 || remaining.length % 2 === 1) {
-                    return false;
-                }
-                else {
-                    // Check if all the remaining characters before the AA*9 are within our alphabet
-                    var re = new RegExp("^[" + IAC_APHABET.substr(0, 20) + "]*$");
-                    return re.test(remaining);
-                }
-            }
-        }
+    return true;
+  };
+
+  /**
+    Determines if a code is a valid short code.
+
+    A short Open Location Code is a sequence created by removing four or more
+    digits from an Open Location Code. It must include a separator
+    character.
+   */
+  OpenLocationCode.prototype.isShort = function(code) {
+    // Check it's valid.
+    if (!this.isValid(code)) {
+      return false;
+    }
+    // If there are less characters than expected before the SEPARATOR.
+    if (code.indexOf(SEPARATOR_) >= 0 &&
+        code.indexOf(SEPARATOR_) < SEPARATOR_POSITION_) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+    Determines if a code is a valid full Open Location Code.
+
+    Not all possible combinations of Open Location Code characters decode to
+    valid latitude and longitude values. This checks that a code is valid
+    and also that the latitude and longitude values are legal. If the prefix
+    character is present, it must be the first character. If the separator
+    character is present, it must be after four characters.
+   */
+  OpenLocationCode.prototype.isFull = function(code) {
+    if (!this.isValid(code)) {
+      return false;
+    }
+    // If it's short, it's not full.
+    if (this.isShort(code)) {
+      return false;
     }
 
-    /**
-     * Encode a location into an IOTA Area Code.
-     * @param latitude The latitude in signed decimal degrees. Values less than -90 will be clipped to -90, values over 90 will be clipped to 90.
-     * @param longitude The longitude in signed decimal degrees. This will be normalised to the range -180 to 180.
-     * @param precision The desired code length. If omitted, CodePrecision.NORMAL will be used. For precision CodePrecision.EXTRA is recommended.
-     * @returns The IOTA Area Code for the location.
-     */
-    function encode(latitude, longitude, precision) {
-        if (precision === void 0) { precision = CodePrecision.NORMAL; }
-        if (precision < 2) {
-            throw new Error("The precision is not valid");
-        }
-        return fromOpenLocationCode(OpenLocationCode.encode(latitude, longitude, precision));
+    // Work out what the first latitude character indicates for latitude.
+    var firstLatValue = CODE_ALPHABET_.indexOf(
+        code.charAt(0).toUpperCase()) * ENCODING_BASE_;
+    if (firstLatValue >= LATITUDE_MAX_ * 2) {
+      // The code would decode to a latitude of >= 90 degrees.
+      return false;
     }
-    /**
-     * Decode an IOTA Area Code into a location.
-     * @param iotaAreaCode The IOTA Area Code to convert.
-     * @returns The location object.
-     */
-    function decode(iotaAreaCode) {
-        var olc = OpenLocationCode.decode(toOpenLocationCode(iotaAreaCode));
-        return {
-            latitude: olc.latitudeCenter,
-            longitude: olc.longitudeCenter,
-            codePrecision: olc.codeLength,
-            latitudeLow: olc.latitudeLo,
-            latitudeHigh: olc.latitudeHi,
-            longitudeLow: olc.longitudeLo,
-            longitudeHigh: olc.longitudeHi
-        };
+    if (code.length > 1) {
+      // Work out what the first longitude character indicates for longitude.
+      var firstLngValue = CODE_ALPHABET_.indexOf(
+          code.charAt(1).toUpperCase()) * ENCODING_BASE_;
+      if (firstLngValue >= LONGITUDE_MAX_ * 2) {
+        // The code would decode to a longitude of >= 180 degrees.
+        return false;
+      }
     }
-    /**
-     * Convert the Open Location Code to IOTA Area Code.
-     * @param openLocationCode The Open Location Code to convert.
-     * @returns The IOTA Area Code.
-     */
-    function fromOpenLocationCode(openLocationCode) {
-        if (!OpenLocationCode.isValid(openLocationCode)) {
-            throw new Error("The openLocationCode is not valid");
-        }
-        var iac = "";
-        for (var i = 0; i < openLocationCode.length; i++) {
-            var idx = OLC_APHABET.indexOf(openLocationCode[i]);
-            iac += IAC_APHABET[idx];
-        }
-        return iac;
+    return true;
+  };
+
+  /**
+    Encode a location into an Open Location Code.
+
+    Produces a code of the specified length, or the default length if no length
+    is provided.
+
+    The length determines the accuracy of the code. The default length is
+    10 characters, returning a code of approximately 13.5x13.5 meters. Longer
+    codes represent smaller areas, but lengths > 14 are sub-centimetre and so
+    11 or 12 are probably the limit of useful codes.
+
+    Args:
+      latitude: A latitude in signed decimal degrees. Will be clipped to the
+          range -90 to 90.
+      longitude: A longitude in signed decimal degrees. Will be normalised to
+          the range -180 to 180.
+      codeLength: The number of significant digits in the output code, not
+          including any separator characters.
+   */
+  OpenLocationCode.prototype.encode = function(latitude,
+      longitude, codeLength) {
+    if (typeof codeLength == 'undefined') {
+      codeLength = PAIR_CODE_LENGTH_;
     }
-    /**
-     * Convert the IOTA Area Code to Open Location Code.
-     * @param iotaAreaCode The IOTA Area Code to convert.
-     * @returns The Open Location Code.
-     */
-    function toOpenLocationCode(iotaAreaCode) {
-        if (!isValid(iotaAreaCode)) {
-            throw new Error("The iotaAreaCode is not valid");
-        }
-        return iacToOlcInternal(iotaAreaCode);
+    if (codeLength < 2 ||
+        (codeLength < SEPARATOR_POSITION_ && codeLength % 2 == 1)) {
+      throw 'IllegalArgumentException: Invalid Open Location Code length';
+    }
+    // Ensure that latitude and longitude are valid.
+    latitude = clipLatitude(latitude);
+    longitude = normalizeLongitude(longitude);
+    // Latitude 90 needs to be adjusted to be just less, so the returned code
+    // can also be decoded.
+    if (latitude == 90) {
+      latitude = latitude - computeLatitudePrecision(codeLength);
+    }
+    var code = encodePairs(
+        latitude, longitude, Math.min(codeLength, PAIR_CODE_LENGTH_));
+    // If the requested length indicates we want grid refined codes.
+    if (codeLength > PAIR_CODE_LENGTH_) {
+      code += encodeGrid(
+          latitude, longitude, codeLength - PAIR_CODE_LENGTH_);
+    }
+    return code;
+  };
+
+  /**
+    Decodes an Open Location Code into the location coordinates.
+
+    Returns a CodeArea object that includes the coordinates of the bounding
+    box - the lower left, center and upper right.
+
+    Args:
+      code: The Open Location Code to decode.
+
+    Returns:
+      A CodeArea object that provides the latitude and longitude of two of the
+      corners of the area, the center, and the length of the original code.
+   */
+  OpenLocationCode.prototype.decode = function(code) {
+    if (!this.isFull(code)) {
+      throw ('IllegalArgumentException: ' +
+          'Passed Open Location Code is not a valid full code: ' + code);
+    }
+    // Strip out separator character (we've already established the code is
+    // valid so the maximum is one), padding characters and convert to upper
+    // case.
+    code = code.replace(SEPARATOR_, '');
+    code = code.replace(new RegExp(PADDING_CHARACTER_ + '+'), '');
+    code = code.toUpperCase();
+    // Decode the lat/lng pair component.
+    var codeArea = decodePairs(code.substring(0, PAIR_CODE_LENGTH_));
+    // If there is a grid refinement component, decode that.
+    if (code.length <= PAIR_CODE_LENGTH_) {
+      return codeArea;
+    }
+    var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH_));
+    return CodeArea(
+      codeArea.latitudeLo + gridArea.latitudeLo,
+      codeArea.longitudeLo + gridArea.longitudeLo,
+      codeArea.latitudeLo + gridArea.latitudeHi,
+      codeArea.longitudeLo + gridArea.longitudeHi,
+      codeArea.codeLength + gridArea.codeLength);
+  };
+
+  /**
+    Recover the nearest matching code to a specified location.
+
+    Given a short Open Location Code of between four and seven characters,
+    this recovers the nearest matching full code to the specified location.
+
+    The number of characters that will be prepended to the short code, depends
+    on the length of the short code and whether it starts with the separator.
+
+    If it starts with the separator, four characters will be prepended. If it
+    does not, the characters that will be prepended to the short code, where S
+    is the supplied short code and R are the computed characters, are as
+    follows:
+    SSSS    -> RRRR.RRSSSS
+    SSSSS   -> RRRR.RRSSSSS
+    SSSSSS  -> RRRR.SSSSSS
+    SSSSSSS -> RRRR.SSSSSSS
+    Note that short codes with an odd number of characters will have their
+    last character decoded using the grid refinement algorithm.
+
+    Args:
+      shortCode: A valid short OLC character sequence.
+      referenceLatitude: The latitude (in signed decimal degrees) to use to
+          find the nearest matching full code.
+      referenceLongitude: The longitude (in signed decimal degrees) to use
+          to find the nearest matching full code.
+
+    Returns:
+      The nearest full Open Location Code to the reference location that matches
+      the short code. Note that the returned code may not have the same
+      computed characters as the reference location. This is because it returns
+      the nearest match, not necessarily the match within the same cell. If the
+      passed code was not a valid short code, but was a valid full code, it is
+      returned unchanged.
+   */
+  OpenLocationCode.prototype.recoverNearest = function(
+      shortCode, referenceLatitude, referenceLongitude) {
+    if (!this.isShort(shortCode)) {
+      if (this.isFull(shortCode)) {
+        return shortCode;
+      } else {
+        throw 'ValueError: Passed short code is not valid: ' + shortCode;
+      }
+    }
+    // Ensure that latitude and longitude are valid.
+    referenceLatitude = clipLatitude(referenceLatitude);
+    referenceLongitude = normalizeLongitude(referenceLongitude);
+
+    // Clean up the passed code.
+    shortCode = shortCode.toUpperCase();
+    // Compute the number of digits we need to recover.
+    var paddingLength = SEPARATOR_POSITION_ - shortCode.indexOf(SEPARATOR_);
+    // The resolution (height and width) of the padded area in degrees.
+    var resolution = Math.pow(20, 2 - (paddingLength / 2));
+    // Distance from the center to an edge (in degrees).
+    var areaToEdge = resolution / 2.0;
+
+    // Now round down the reference latitude and longitude to the resolution.
+    var roundedLatitude = Math.floor(referenceLatitude / resolution) *
+        resolution;
+    var roundedLongitude = Math.floor(referenceLongitude / resolution) *
+        resolution;
+
+    // Use the reference location to pad the supplied short code and decode it.
+    var codeArea = this.decode(
+        this.encode(roundedLatitude, roundedLongitude).substr(0, paddingLength)
+        + shortCode);
+    // How many degrees latitude is the code from the reference? If it is more
+    // than half the resolution, we need to move it east or west.
+    var degreesDifference = codeArea.latitudeCenter - referenceLatitude;
+    if (degreesDifference > areaToEdge) {
+      // If the center of the short code is more than half a cell east,
+      // then the best match will be one position west.
+      codeArea.latitudeCenter -= resolution;
+    } else if (degreesDifference < -areaToEdge) {
+      // If the center of the short code is more than half a cell west,
+      // then the best match will be one position east.
+      codeArea.latitudeCenter += resolution;
     }
 
-    /**
-     * All the available precisions.
-     */
-    var PRECISIONS = [2, 4, 6, 8, 10, 11];
-    /**
-     * Decrease the precision of an area code.
-     * @param iotaAreaCode The IOTA Area Code to decrease the precision.
-     * @returns The decreased precision area code.
-     */
-    function decreasePrecision(iotaAreaCode) {
-        var decoded = decode(iotaAreaCode);
-        if (decoded.codePrecision <= PRECISIONS[0]) {
-            throw new Error("The precision can not be decreased any more");
-        }
-        return internalSetPrecision(iotaAreaCode, PRECISIONS[PRECISIONS.indexOf(decoded.codePrecision) - 1], decoded);
-    }
-    /**
-     * Increase the precision of an area code.
-     * @param iotaAreaCode The IOTA Area Code to increase the precision.
-     * @returns The increased precision area code.
-     */
-    function increasePrecision(iotaAreaCode) {
-        var decoded = decode(iotaAreaCode);
-        if (decoded.codePrecision >= PRECISIONS[PRECISIONS.length - 1]) {
-            throw new Error("The precision can not be increased any more");
-        }
-        return internalSetPrecision(iotaAreaCode, PRECISIONS[PRECISIONS.indexOf(decoded.codePrecision) + 1], decoded);
-    }
-    /**
-     * Set the precision of an area code.
-     * @param iotaAreaCode The IOTA Area Code to set the precision.
-     * @param codePrecision The new precision to set.
-     * @returns The updated precision area code.
-     */
-    function setPrecision(iotaAreaCode, codePrecision) {
-        var decoded = decode(iotaAreaCode);
-        return internalSetPrecision(iotaAreaCode, codePrecision, decoded);
-    }
-    /**
-     * Set the precision of an area code.
-     * @private
-     * @param iotaAreaCode The IOTA Area Code to set the precision.
-     * @param codePrecision The new precision to set.
-     * @param decoded The decoded area code.
-     * @returns The updated precision area code.
-     */
-    function internalSetPrecision(iotaAreaCode, codePrecision, decoded) {
-        if (PRECISIONS.indexOf(codePrecision) < 0) {
-            throw new Error("codePrecision must be one of " + PRECISIONS.join(", "));
-        }
-        if (codePrecision === decoded.codePrecision) {
-            return iotaAreaCode;
-        }
-        else {
-            // The new code precision is less than the current one
-            // so just strip back the characters and pad
-            if (codePrecision < decoded.codePrecision) {
-                var reduced = iotaAreaCode.replace("9", "").substr(0, codePrecision);
-                if (codePrecision <= 8) {
-                    return "" + reduced + "A".repeat(8 - codePrecision) + "9";
-                }
-                else {
-                    return reduced.substr(0, 8) + "9" + reduced.substr(8);
-                }
-            }
-            else {
-                // New precision is higher so we need to do some maths
-                // so just recalculate the location code based
-                // on the current center.
-                return encode(decoded.latitude, decoded.longitude, codePrecision);
-            }
-        }
-    }
-    /**
-     * Get the display dimensions for a area code precision.
-     * @param codePrecision The precision of an area code.
-     * @returns The display dimensions for the code precision.
-     */
-    function getPrecisionDimensions(codePrecision) {
-        var dimensions = {
-            2: {
-                blocksSizeDegrees: 20,
-                blocksSizeDegreesFormatted: "20°",
-                sizeMetres: 2200000,
-                sizeMetresFormatted: "2200km"
-            },
-            4: {
-                blocksSizeDegrees: 1,
-                blocksSizeDegreesFormatted: "1°",
-                sizeMetres: 110000,
-                sizeMetresFormatted: "110km"
-            },
-            6: {
-                blocksSizeDegrees: 0.05,
-                blocksSizeDegreesFormatted: "0.05°",
-                sizeMetres: 5500,
-                sizeMetresFormatted: "110km"
-            },
-            8: {
-                blocksSizeDegrees: 0.0025,
-                blocksSizeDegreesFormatted: "0.0025°",
-                sizeMetres: 275,
-                sizeMetresFormatted: "275m"
-            },
-            10: {
-                blocksSizeDegrees: 0.000125,
-                blocksSizeDegreesFormatted: "0.000125°",
-                sizeMetres: 14,
-                sizeMetresFormatted: "14m"
-            },
-            11: {
-                blocksSizeDegrees: undefined,
-                blocksSizeDegreesFormatted: undefined,
-                sizeMetres: 3.5,
-                sizeMetresFormatted: "3.5m"
-            }
-        };
-        if (!dimensions[codePrecision]) {
-            throw new Error("codePrecision must be 2, 4, 6, 8, 10 or 11");
-        }
-        return dimensions[codePrecision];
+    // How many degrees longitude is the code from the reference?
+    degreesDifference = codeArea.longitudeCenter - referenceLongitude;
+    if (degreesDifference > areaToEdge) {
+      codeArea.longitudeCenter -= resolution;
+    } else if (degreesDifference < -areaToEdge) {
+      codeArea.longitudeCenter += resolution;
     }
 
-    /**
-     * Extract an IOTA Area Code from trytes.
-     * @param trytes The trytes from which to try and extract the IOTA Area Code.
-     * @returns The IOTA Area Code if one could be extracted, or undefined.
-     */
-    function extract(trytes) {
-        var reString = "([" + IAC_APHABET.substr(0, 9) + "][" + IAC_APHABET.substr(0, 18) + "][" + IAC_APHABET.substr(0, 21) + "]{6}9(?:[" + IAC_APHABET.substr(0, 20) + "]{2,3})?)";
-        var result = new RegExp(reString).exec(trytes);
-        return result ? result[1] : undefined;
+    return this.encode(
+        codeArea.latitudeCenter, codeArea.longitudeCenter, codeArea.codeLength);
+  };
+
+  /**
+    Remove characters from the start of an OLC code.
+
+    This uses a reference location to determine how many initial characters
+    can be removed from the OLC code. The number of characters that can be
+    removed depends on the distance between the code center and the reference
+    location.
+
+    The minimum number of characters that will be removed is four. If more than
+    four characters can be removed, the additional characters will be replaced
+    with the padding character. At most eight characters will be removed.
+
+    The reference location must be within 50% of the maximum range. This ensures
+    that the shortened code will be able to be recovered using slightly different
+    locations.
+
+    Args:
+      code: A full, valid code to shorten.
+      latitude: A latitude, in signed decimal degrees, to use as the reference
+          point.
+      longitude: A longitude, in signed decimal degrees, to use as the reference
+          point.
+
+    Returns:
+      Either the original code, if the reference location was not close enough,
+      or the .
+   */
+  OpenLocationCode.prototype.shorten = function(
+      code, latitude, longitude) {
+    if (!this.isFull(code)) {
+      throw 'ValueError: Passed code is not valid and full: ' + code;
     }
+    if (code.indexOf(PADDING_CHARACTER_) != -1) {
+      throw 'ValueError: Cannot shorten padded codes: ' + code;
+    }
+    var code = code.toUpperCase();
+    var codeArea = this.decode(code);
+    if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_) {
+      throw 'ValueError: Code length must be at least ' +
+          MIN_TRIMMABLE_CODE_LEN_;
+    }
+    // Ensure that latitude and longitude are valid.
+    latitude = clipLatitude(latitude);
+    longitude = normalizeLongitude(longitude);
+    // How close are the latitude and longitude to the code center.
+    var range = Math.max(
+        Math.abs(codeArea.latitudeCenter - latitude),
+        Math.abs(codeArea.longitudeCenter - longitude));
+    for (var i = PAIR_RESOLUTIONS_.length - 2; i >= 1; i--) {
+      // Check if we're close enough to shorten. The range must be less than 1/2
+      // the resolution to shorten at all, and we want to allow some safety, so
+      // use 0.3 instead of 0.5 as a multiplier.
+      if (range < (PAIR_RESOLUTIONS_[i] * 0.3)) {
+        // Trim it.
+        return code.substring((i + 1) * 2);
+      }
+    }
+    return code;
+  };
 
-    exports.CodePrecision = CodePrecision;
-    exports.PRECISIONS = PRECISIONS;
-    exports.decode = decode;
-    exports.decreasePrecision = decreasePrecision;
-    exports.encode = encode;
-    exports.extract = extract;
-    exports.fromOpenLocationCode = fromOpenLocationCode;
-    exports.getPrecisionDimensions = getPrecisionDimensions;
-    exports.increasePrecision = increasePrecision;
-    exports.internalSetPrecision = internalSetPrecision;
-    exports.isValid = isValid;
-    exports.isValidPartial = isValidPartial;
-    exports.setPrecision = setPrecision;
-    exports.toOpenLocationCode = toOpenLocationCode;
+  /**
+    Clip a latitude into the range -90 to 90.
 
-    Object.defineProperty(exports, '__esModule', { value: true });
+    Args:
+      latitude: A latitude in signed decimal degrees.
+   */
+  var clipLatitude = function(latitude) {
+    return Math.min(90, Math.max(-90, latitude));
+  };
 
-}));
+  /**
+    Compute the latitude precision value for a given code length. Lengths <=
+    10 have the same precision for latitude and longitude, but lengths > 10
+    have different precisions due to the grid method having fewer columns than
+    rows.
+   */
+  var computeLatitudePrecision = function(codeLength) {
+    if (codeLength <= 10) {
+      return Math.pow(20, Math.floor(codeLength / -2 + 2));
+    }
+    return Math.pow(20, -3) / Math.pow(GRID_ROWS_, codeLength - 10);
+  };
 
+  /**
+    Normalize a longitude into the range -180 to 180, not including 180.
+
+    Args:
+      longitude: A longitude in signed decimal degrees.
+   */
+  var normalizeLongitude = function(longitude) {
+    while (longitude < -180) {
+      longitude = longitude + 360;
+    }
+    while (longitude >= 180) {
+      longitude = longitude - 360;
+    }
+    return longitude;
+  };
+
+  /**
+    Encode a location into a sequence of OLC lat/lng pairs.
+
+    This uses pairs of characters (longitude and latitude in that order) to
+    represent each step in a 20x20 grid. Each code, therefore, has 1/400th
+    the area of the previous code.
+
+    Args:
+      latitude: A latitude in signed decimal degrees.
+      longitude: A longitude in signed decimal degrees.
+      codeLength: The number of significant digits in the output code, not
+          including any separator characters.
+   */
+  var encodePairs = function(latitude, longitude, codeLength) {
+    var code = '';
+    // Adjust latitude and longitude so they fall into positive ranges.
+    var adjustedLatitude = latitude + LATITUDE_MAX_;
+    var adjustedLongitude = longitude + LONGITUDE_MAX_;
+    // Count digits - can't use string length because it may include a separator
+    // character.
+    var digitCount = 0;
+    while (digitCount < codeLength) {
+      // Provides the value of digits in this place in decimal degrees.
+      var placeValue = PAIR_RESOLUTIONS_[Math.floor(digitCount / 2)];
+      // Do the latitude - gets the digit for this place and subtracts that for
+      // the next digit.
+      var digitValue = Math.floor(adjustedLatitude / placeValue);
+      adjustedLatitude -= digitValue * placeValue;
+      code += CODE_ALPHABET_.charAt(digitValue);
+      digitCount += 1;
+      // And do the longitude - gets the digit for this place and subtracts that
+      // for the next digit.
+      digitValue = Math.floor(adjustedLongitude / placeValue);
+      adjustedLongitude -= digitValue * placeValue;
+      code += CODE_ALPHABET_.charAt(digitValue);
+      digitCount += 1;
+      // Should we add a separator here?
+      if (digitCount == SEPARATOR_POSITION_ && digitCount < codeLength) {
+        code += SEPARATOR_;
+      }
+    }
+    if (code.length < SEPARATOR_POSITION_) {
+      code = code + Array(SEPARATOR_POSITION_ - code.length + 1).join(PADDING_CHARACTER_);
+    }
+    if (code.length == SEPARATOR_POSITION_) {
+      code = code + SEPARATOR_;
+    }
+    return code;
+  };
+
+  /**
+    Encode a location using the grid refinement method into an OLC string.
+
+    The grid refinement method divides the area into a grid of 4x5, and uses a
+    single character to refine the area. This allows default accuracy OLC codes
+    to be refined with just a single character.
+
+    Args:
+      latitude: A latitude in signed decimal degrees.
+      longitude: A longitude in signed decimal degrees.
+      codeLength: The number of characters required.
+   */
+  var encodeGrid = function(latitude, longitude, codeLength) {
+    var code = '';
+    var latPlaceValue = GRID_SIZE_DEGREES_;
+    var lngPlaceValue = GRID_SIZE_DEGREES_;
+    // Adjust latitude and longitude so they fall into positive ranges and
+    // get the offset for the required places.
+    var adjustedLatitude = (latitude + LATITUDE_MAX_) % latPlaceValue;
+    var adjustedLongitude = (longitude + LONGITUDE_MAX_) % lngPlaceValue;
+    for (var i = 0; i < codeLength; i++) {
+      // Work out the row and column.
+      var row = Math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_));
+      var col = Math.floor(adjustedLongitude / (lngPlaceValue / GRID_COLUMNS_));
+      latPlaceValue /= GRID_ROWS_;
+      lngPlaceValue /= GRID_COLUMNS_;
+      adjustedLatitude -= row * latPlaceValue;
+      adjustedLongitude -= col * lngPlaceValue;
+      code += CODE_ALPHABET_.charAt(row * GRID_COLUMNS_ + col);
+    }
+    return code;
+  };
+
+  /**
+    Decode an OLC code made up of lat/lng pairs.
+
+    This decodes an OLC code made up of alternating latitude and longitude
+    characters, encoded using base 20.
+
+    Args:
+      code: A valid OLC code, presumed to be full, but with the separator
+      removed.
+   */
+  var decodePairs = function(code) {
+    // Get the latitude and longitude values. These will need correcting from
+    // positive ranges.
+    var latitude = decodePairsSequence(code, 0);
+    var longitude = decodePairsSequence(code, 1);
+    // Correct the values and set them into the CodeArea object.
+    return new CodeArea(
+        latitude[0] - LATITUDE_MAX_,
+        longitude[0] - LONGITUDE_MAX_,
+        latitude[1] - LATITUDE_MAX_,
+        longitude[1] - LONGITUDE_MAX_,
+        code.length);
+  };
+
+  /**
+    Decode either a latitude or longitude sequence.
+
+    This decodes the latitude or longitude sequence of a lat/lng pair encoding.
+    Starting at the character at position offset, every second character is
+    decoded and the value returned.
+
+    Args:
+      code: A valid OLC code, presumed to be full, with the separator removed.
+      offset: The character to start from.
+
+    Returns:
+      A pair of the low and high values. The low value comes from decoding the
+      characters. The high value is the low value plus the resolution of the
+      last position. Both values are offset into positive ranges and will need
+      to be corrected before use.
+   */
+  var decodePairsSequence = function(code, offset) {
+    var i = 0;
+    var value = 0;
+    while (i * 2 + offset < code.length) {
+      value += CODE_ALPHABET_.indexOf(code.charAt(i * 2 + offset)) *
+          PAIR_RESOLUTIONS_[i];
+      i += 1;
+    }
+    return [value, value + PAIR_RESOLUTIONS_[i - 1]];
+  };
+
+  /**
+    Decode the grid refinement portion of an OLC code.
+
+    This decodes an OLC code using the grid refinement method.
+
+    Args:
+      code: A valid OLC code sequence that is only the grid refinement
+          portion. This is the portion of a code starting at position 11.
+   */
+  var decodeGrid = function(code) {
+    var latitudeLo = 0.0;
+    var longitudeLo = 0.0;
+    var latPlaceValue = GRID_SIZE_DEGREES_;
+    var lngPlaceValue = GRID_SIZE_DEGREES_;
+    var i = 0;
+    while (i < code.length) {
+      var codeIndex = CODE_ALPHABET_.indexOf(code.charAt(i));
+      var row = Math.floor(codeIndex / GRID_COLUMNS_);
+      var col = codeIndex % GRID_COLUMNS_;
+
+      latPlaceValue /= GRID_ROWS_;
+      lngPlaceValue /= GRID_COLUMNS_;
+
+      latitudeLo += row * latPlaceValue;
+      longitudeLo += col * lngPlaceValue;
+      i += 1;
+    }
+    return CodeArea(
+        latitudeLo, longitudeLo, latitudeLo + latPlaceValue,
+        longitudeLo + lngPlaceValue, code.length);
+  };
+  
+    /**
+    Coordinates of a decoded Open Location Code.
+
+    The coordinates include the latitude and longitude of the lower left and
+    upper right corners and the center of the bounding box for the area the
+    code represents.
+
+    Attributes:
+      latitude_lo: The latitude of the SW corner in degrees.
+      longitude_lo: The longitude of the SW corner in degrees.
+      latitude_hi: The latitude of the NE corner in degrees.
+      longitude_hi: The longitude of the NE corner in degrees.
+      latitude_center: The latitude of the center in degrees.
+      longitude_center: The longitude of the center in degrees.
+      code_length: The number of significant characters that were in the code.
+          This excludes the separator.
+   */
+  var CodeArea = OpenLocationCode.prototype.CodeArea = function(
+    latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
+    return new CodeAreaFn.init(
+        latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength);
+  };
+  
+  var CodeAreaFn = {
+    init: function(
+        latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
+      this.latitudeLo = latitudeLo;
+      this.longitudeLo = longitudeLo;
+      this.latitudeHi = latitudeHi;
+      this.longitudeHi = longitudeHi;
+      this.codeLength = codeLength;
+      this.latitudeCenter = Math.min(
+          latitudeLo + (latitudeHi - latitudeLo) / 2, LATITUDE_MAX_);
+      this.longitudeCenter = Math.min(
+          longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX_);
+    }
+  };
+
+
+exports.OpenLocationCode = OpenLocationCode;
 },{}]},{},[1]);

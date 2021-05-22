@@ -1,9 +1,9 @@
-
 import ipfshttpclient
 
 
 from src.config import SUPERSET_THRESHOLD
 from src.utils import *
+from src.hash_function import *
 
 DOWNLOAD_FOLDER = './objects'
 
@@ -17,8 +17,10 @@ class Client:
         log(self.id, 'CONNECTION', '{}'.format(addr))
 
     def add_obj(self, path, keyword):
-        obj_hash = self.ipfs.add(path)['Hash']
+        #obj_hash = self.ipfs.add(path)['Hash']
+        obj_hash = path
         print("binary",create_binary_id(self.server))
+        keyword = final_keyword(str(keyword))
 
         if request(create_binary_id(self.server), INSERT, {'keyword': str(keyword), 'obj': obj_hash, 'hop': str(0)}).text == 'success':
             res = 'REFERENCE ({},{}) ADDED'.format(keyword, obj_hash)
@@ -48,6 +50,8 @@ class Client:
         return res
 
     def pin_search(self, keyword, threshold=-1):
+        keyword = final_keyword(str(keyword))
+
         if threshold == -1:
             res = get_response(request(create_binary_id(self.server), PIN_SEARCH, {'keyword': str(keyword)}).text)
         else:
@@ -60,6 +64,7 @@ class Client:
         return res
 
     def superset_search(self, keyword, threshold=SUPERSET_THRESHOLD):
+        keyword = final_keyword(str(keyword))
         res = get_response(request(create_binary_id(self.server), SUPERSET_SEARCH, {'keyword': str(keyword), 'threshold': threshold, 'sender': 'user'}).text)
         if len(res) > 0:
             log(self.id, SUPERSET_SEARCH[1:], '{}'.format(res))
@@ -71,4 +76,3 @@ class Client:
     def close(self):
         self.ipfs.close()
         return
-

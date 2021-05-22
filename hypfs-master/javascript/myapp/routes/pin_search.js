@@ -1,3 +1,4 @@
+const { json } = require('body-parser');
 var express = require('express');
 var router = express.Router();
 const request = require('request');
@@ -6,17 +7,20 @@ const utils = require('../utils')
 
 
 router.post('/pin_search', async function (req, res) {
+    const point = req.body.keyword
+    const threshold = req.body.threshold
+    const encoded_point = utils.binToStr(utils.encode(point))
+    console.log("point:", point, "encoded_point:", encoded_point)
 
-    keyword = JSON.parse(req.body.keyword)
-    threshold = JSON.parse(req.body.threshold)
 
-    make_req(keyword, threshold, async function (data) {
+    make_req(encoded_point, threshold, async function (data) {
 
         if (data != undefined) {
 
             roots = utils.split_str(data)
             console.log(roots)
             resultFetch = []
+            //get data from MAM
             for (const root of roots) {
 
                 await myModuleFetch.fetchData(root).then(function (res) {
@@ -24,8 +28,8 @@ router.post('/pin_search', async function (req, res) {
 
                 })
             }
-
             res.send(resultFetch)
+
         } else {
             console.log("no result found")
             res.send("No result found")
@@ -33,7 +37,6 @@ router.post('/pin_search', async function (req, res) {
     })
 
 });
-
 
 
 const make_req = async function (keyword, threshold, callback) {

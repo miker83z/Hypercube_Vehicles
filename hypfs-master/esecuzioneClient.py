@@ -54,7 +54,7 @@ def pin_search():
     while not 0 <= keyword < NODES:
         print("Error: Keyword entered not valid")
         input_str = input("isert key >>>")
-        keyword= input_int(input_str)
+        keyword= input_str
         if not keyword and keyword != 0:
             return
 
@@ -71,7 +71,8 @@ def superset_search():
     while not 0 <= keyword < NODES:
         print('Error: Keyword entered not valid')
         input_str = input("isert key >>>")
-        keyword= input_int(input_str)
+        #keyword= input_int(input_str)
+        keyword= input_str
         if not keyword and keyword != 0:
             return
     print('Valid keyword')
@@ -102,8 +103,6 @@ def provaSenzaIPFS():
     
 
 
-
-
 ans=True
 while ans:
     print ("""
@@ -132,40 +131,10 @@ while ans:
 
 
 
-def strToBinary(s):
-    bin_conv = []
-
-    for c in s:
-          
-        # convert each char to
-        # ASCII value
-        ascii_val = ord(c)
-        # Convert ASCII value to binary
-        binary_val = bin(ascii_val)
-        bin_conv.append(binary_val[2:])
-          
-    return (' '.join(bin_conv))
 
 
-def binaryToDecimal(n):
-    return int(n,2)
-  
 
 
-#include <iostream>
-#include <functional>
-#include <string>
-'''
-def onebyte_hash(s):
-    return hash(s) % 10
-
-'''
-import hashlib
-
-
-def strToInt(codeStr):
-    h = int(hashlib.md5(codeStr.encode('utf8')).hexdigest(),16) % 8
-    return h
 
 '''
   
@@ -177,7 +146,6 @@ if __name__ == '__main__':
     iac1 = "nphtqorl9xkp"
     iac4 = "npfffgrl9efe"
     #print(onebyte_hash('NPHTQORL9XKP'))
-
     print(strToInt(iac0))
     print(strToInt(iac1))
     print(strToInt(iac1))
@@ -186,10 +154,4 @@ if __name__ == '__main__':
 '''
     
     
-
-
-    
-
-
-
 

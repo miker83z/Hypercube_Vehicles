@@ -13,12 +13,9 @@ RESET_HOPS = '/reset_hops'
 GET_HOPS = '/get_hops'
 
 
-
-
 def request(neighbor, operation, params={}):
     increase_hops()
     url = "http://{}:{}{}".format(LOCAL_HOST, str(get_decimal(neighbor) + INIT_PORT), operation)
-    print("URL", url, params)
     return requests.get(url=url, params=params)
 
 
@@ -70,5 +67,3 @@ def get_response(res):
         return res.split(',')
     else:
         return []
-
-

@@ -1,7 +1,5 @@
-const iotaAreaCodes = require('@iota/area-codes');
-
-
-
+///browserify requests.js -o bundle.js 
+var OpenLocationCode = require('open-location-code').OpenLocationCode
 function client_request(url, data, operation) {
 
     $.ajax({
@@ -33,20 +31,21 @@ global.choose_operation = function (operation) {
             break;
         case "pin_search":
 
+
             url = '/pin_search'
-            data = JSON.stringify({ 'keyword': 2, "threshold": -1 })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": -1 })
 
             break;
         case "superset_search":
 
             url = '/superset_search'
-            data = JSON.stringify({ 'keyword': 4, "threshold": 5 })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": 5 })
             break;
 
         case "remove":
 
             url = '/remove'
-            data = JSON.stringify({ 'keyword': 2, "obj": "DOWOEGCRBXJAN9GTLDHRSDED9BODDMOTMIAOUHER9FSXPKHCMUEURAFWIHAACWRBMWOBMJWCUMAHYEFMU" })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "obj": "JTXBOI9PSLJQUQOEJHULRVHBFDOEFTGXZQZAGS9ZSUGXJTJFFKPN9PIQGWONMJXMIRAKLWIW9YSFICUU9" })
             break;
 
     }
@@ -57,15 +56,16 @@ global.choose_operation = function (operation) {
 
 global.output_data = function (operation, data) {
     console.log(data)
-    var count = 0
+
 
     switch (operation) {
         case "pin_search":
         case "superset_search":
             for (element of data[0]) {
 
-                coord = decodeIAC(element.message)
-                L.marker([coord.latitude, coord.longitude]).addTo(layerGroup);
+                coord = decodeOLC(element.message)
+                console.log(coord)
+                L.marker([coord.latitudeCenter, coord.longitudeCenter]).addTo(layerGroup);
                 //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
             }
 
@@ -81,12 +81,10 @@ global.output_data = function (operation, data) {
     }
 }
 
-function decodeIAC(IAC_point) {
+function decodeOLC(code) {
 
-
-    if (iotaAreaCodes.isValid(IAC_point)) {
-        const codeArea = iotaAreaCodes.decode(IAC_point);
-        return codeArea
-    }
+    const openLocationCode = new OpenLocationCode();
+    const coord = openLocationCode.decode(code)
+    return coord
 
 }

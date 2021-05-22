@@ -3,36 +3,30 @@ var router = express.Router();
 const request = require('request');
 const myModulePublish = require('../IOTA_services/publishMAM');
 const execute = myModulePublish.execute
-const iotaAreaCodes = require('@iota/area-codes');
 const utils = require('../utils')
-
 
 /* POST data into  DHT and MAM */
 
 router.post('/insert', async function (req, res) {
 
+  const point = utils.generate_coord()
+  const encoded_point = utils.binToStr(utils.encode(point))
+  console.log("encoded_point:", encoded_point)
+  console.log("point:", point)
 
-  keyword = Math.floor(Math.random() * 7) + 1
-  obj = utils.generate_coord()
-  console.log(keyword, obj)
 
-  //insert data in MAM
-  var iac = iotaAreaCodes.encode(obj.latitude, obj.longitude);
-  console.log("IAC:", iac)
-  //TODO: METTERE CONTROLLO IAC
-  var root = await execute(iac)
+  var root = await execute(point)
 
   //request to DHT
 
-  make_req(keyword, root, function (data) {
-
+  make_req(encoded_point, root, function (data) {
     res.send(data)
   })
 });
 
 
 const make_req = async function (keyword, root, callback) {
-
+  console.log("Inserimento su DHT")
   const options = {
     url: 'http://127.0.0.1:50001/insert',
     method: 'GET',
@@ -46,9 +40,7 @@ const make_req = async function (keyword, root, callback) {
       return console.error('upload failed:', err);
     }
     console.log('Server responded with:', body);
-
     callback(body)
-
   })
 }
 

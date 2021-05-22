@@ -2,9 +2,6 @@
 //Require MAM package from iota.js
 const Mam = require('@iota/mam')
 const { asciiToTrytes } = require('@iota/converter')
-const fs = require('fs')
-const iotaAreaCodes = require('@iota/area-codes');
-
 
 //MAM setup
 const mode = 'restricted'
@@ -13,7 +10,7 @@ const provider = 'https://nodes.devnet.iota.org'
 const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encodeURIComponent(provider)}&mode=${mode}&key=${secretKey.padEnd(81, '9')}&root=`
 
 //Put your own seed here 
-const seed = 'SDRNSFAIGKGCLVHFDRKHPFRETRIXJKUWBIMQWBAKPHLVQMTZBJWCMRZXFLDPOXJDGATIBTFQLJZTXZTBH'
+const seed = '99YOCAMVNDE9HMJUZBLRGYBHGBOQKNYVUJYPOZIOKBIZBQRKLIPKBLXKIJMFJGSQSGXHABXGSKMQUCGVU'
 
 //Initialize MAM state object
 mamState = Mam.init(provider, seed)
@@ -25,14 +22,14 @@ mamState = Mam.init(provider, seed)
 //console.log('Stored: ',stored)
 
 //let mamState = JSON.parse(stored)
-console.log('MamState: ', mamState)
+//console.log('MamState: ', mamState)
 
 //Change MAM state to previous and change mode
 Mam.changeMode(mamState, mode, secretKey)  ///////MODALITà RESTRICTED
 
 // Publish to tangle
 
-const publish = async (packet, tag) => {
+const publish = async (packet) => {
   
     // Create MAM Payload - STRING OF TRYTES
     const trytes = asciiToTrytes(JSON.stringify(packet))
@@ -41,9 +38,9 @@ const publish = async (packet, tag) => {
     // Save new mamState
     mamState = message.state
     //fs.writeFileSync('mam_state.json', JSON.stringify(mamState))
-
+    root = "DOWOEGCRBXJAN9GTLDHRSDED9BODDMOTMIAOUHER9FSXPKHCMUEURAFWIHAACWRBMWOBMJWCUMAHYEFMU"
     // Attach the payload
-    await Mam.attach(message.payload, message.address, 3, 9, tag)
+    await Mam.attach(message.payload, message.address, 3, 9)
   
 
     //console.log('Published', packet, '\n');
@@ -56,16 +53,16 @@ const publish = async (packet, tag) => {
         console.log('\r\nUpdated root: ', message.root, '\r\n')
     }
     */
-
     return message.root
 }
 
 
-execute = async (tag) => {
+execute = async (code) => {
+    console.log("code su MAM", code)
     const root = await publish({
-        message: tag,
+        message: code,
         timestamp: (new Date()).toLocaleString()
-    }, tag);
+    });
 
 
     console.log(`Verify with MAM Explorer:\n${mamExplorerLink}${root}\n`)
@@ -76,15 +73,7 @@ execute = async (tag) => {
 
 
 const start = async function () {
-
-
-    const iac = iotaAreaCodes.encode(31.895379, 60.363030);
-    const iac2 = iotaAreaCodes.encode(44.503016, 11.303739, iotaAreaCodes.CodePrecision.EXTRA);
-    const iac3 = iotaAreaCodes.encode(44.486871, 11.288720, iotaAreaCodes.CodePrecision.EXTRA)
-    console.log("iac", iac, iac2, iac3)
     tag = 'MKNSJWGM9QP'
-
-
     await execute(tag)
     /*
     var i = 1

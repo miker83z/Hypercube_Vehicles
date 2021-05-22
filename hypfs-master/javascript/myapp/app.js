@@ -1,12 +1,13 @@
 'use strict';
 const express = require('express');
 const path = require('path');
+var config = require('./config');
 var bodyParser = require('body-parser');
 
 
 const app = express();
 
-const port = process.env.PORT || 3000;
+
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
@@ -28,8 +29,8 @@ app.use(pin_search)
 app.use(remove)
 
 
-app.listen(port, () => {
-  console.log(`app listening at http://localhost:${port}`)
+app.listen(config.web.port, () => {
+  console.log(`app listening at http://localhost:${config.web.port}`)
 })
 
 

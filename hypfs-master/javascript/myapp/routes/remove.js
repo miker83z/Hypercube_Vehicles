@@ -5,15 +5,16 @@ utils = require("../utils")
 
 router.post('/remove', async function (req, res) {
 
-    keyword = req.body.keyword
+    point = req.body.keyword
     root = req.body.obj
+    const encoded_point = utils.binToStr(utils.encode(point))
 
-    console.log(keyword, root)
+    console.log(encoded_point, root)
 
     const options = {
         url: 'http://127.0.0.1:50001/remove',
         method: 'GET',
-        qs: { 'keyword': keyword, "obj": root },
+        qs: { 'keyword': encoded_point, "obj": root },
         json: true
     };
 
@@ -36,9 +37,5 @@ async function make_req(options, callback) {
         callback(body)
     })
 }
-
-
-
-
-
+ 
 module.exports = router;

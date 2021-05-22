@@ -20,7 +20,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def request_insert():
     print("argomenti", request)
     print("argomenti", request.args)
-    keyword = int(request.args.get('keyword'))
+    #keyword = int(request.args.get('keyword'))
+    keyword = request.args.get('keyword')
     print("key int", keyword)
     obj = request.args.get('obj')
     res = NODE.insert(keyword, obj)
@@ -35,7 +36,7 @@ def request_insert():
 
 @app.route(REMOVE)
 def request_remove():
-    keyword = int(request.args.get('keyword'))
+    keyword = request.args.get('keyword')
     obj = request.args.get('obj')
     res = NODE.remove(keyword, obj)
     if type(res) is not str:
@@ -45,8 +46,9 @@ def request_remove():
 
 @app.route(PIN_SEARCH)
 def request_pin_search():
-    keyword = int(request.args.get('keyword'))
+    keyword = request.args.get('keyword')
     threshold = request.args.get('threshold')
+    print("key pin search", keyword)
     if threshold is None:
         res = NODE.pin_search(keyword)
     else:
@@ -60,7 +62,7 @@ def request_pin_search():
 
 @app.route(SUPERSET_SEARCH)
 def request_superset_search():
-    keyword = int(request.args.get('keyword'))
+    keyword = request.args.get('keyword')
     threshold = int(request.args.get('threshold'))
     sender = request.args.get('sender')
     res = NODE.superset_search(keyword, threshold, sender)
