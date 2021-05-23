@@ -63,7 +63,17 @@ global.output_data = function (operation, data) {
     switch (operation) {
         case "pin_search":
         case "superset_search":
-            for (element of data[0]) {
+
+            var messages = []
+            for (i = 0; i < data.length; i++) {
+                for (j = 0; j < data[i].length; j++) {
+                    console.log(data[i][j])
+                    messages.push(data[i][j])
+                }
+            }
+
+            for (element of messages) {
+                //console.log(element)
 
                 coord = decodeOLC(element.message)
                 console.log(coord)
@@ -88,7 +98,6 @@ function decodeOLC(code) {
     const openLocationCode = new OpenLocationCode();
     const coord = openLocationCode.decode(code)
     return coord
-
 
 }
 

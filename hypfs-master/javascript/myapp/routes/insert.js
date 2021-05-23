@@ -11,14 +11,11 @@ router.post('/insert', async function (req, res) {
 
   const point = utils.generate_coord()
   const encoded_point = utils.binToStr(utils.encode(point))
-  console.log("encoded_point:", encoded_point)
-  console.log("point:", point)
-
+  console.log("POINT:", point, "-->", "ENCODED POINT:", encoded_point)
 
   var root = await execute(point)
-
+  
   //request to DHT
-
   make_req(encoded_point, root, function (data) {
     res.send(data)
   })
@@ -26,7 +23,7 @@ router.post('/insert', async function (req, res) {
 
 
 const make_req = async function (keyword, root, callback) {
-  console.log("Inserimento su DHT")
+  console.log("REQUEST INSERT DHT DONE.")
   const options = {
     url: 'http://127.0.0.1:50001/insert',
     method: 'GET',
@@ -37,7 +34,7 @@ const make_req = async function (keyword, root, callback) {
   request(options, function optionalCallback(err, httpResponse, body) {
 
     if (err) {
-      return console.error('upload failed:', err);
+      return console.error('Upload failed:', err);
     }
     console.log('Server responded with:', body);
     callback(body)

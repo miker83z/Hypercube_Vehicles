@@ -9,7 +9,7 @@ router.post('/superset_search', async function (req, res) {
     const point = req.body.keyword
     const threshold = req.body.threshold
     const encoded_point = utils.binToStr(utils.encode(point))
-    console.log("point:", point, "encoded_point:", encoded_point)
+    console.log("POINT:", point, "-->", "ENCODED POINT:", encoded_point)
 
     make_req(encoded_point, threshold, async function (data) {
 
@@ -19,6 +19,8 @@ router.post('/superset_search', async function (req, res) {
             console.log(roots)
             resultFetch = []
             //get data from MAM
+            console.log('Fetch data from the tangle. Please be patient...')
+
             for (const root of roots) {
 
                 await myModuleFetch.fetchData(root).then(function (res) {
@@ -26,10 +28,10 @@ router.post('/superset_search', async function (req, res) {
 
                 })
             }
-
+            console.log('DONE.')
             res.send(resultFetch)
         } else {
-            console.log("no result found")
+            console.log("No result found")
             res.send("No result found")
         }
     })
@@ -47,9 +49,9 @@ const make_req = async function (keyword, threshold, callback) {
     };
 
     request(options, function optionalCallback(err, httpResponse, body) {
-        console.log("request gone")
+        console.log("REQUEST SUPERSET SEARCH DHT DONE.")
         if (err) {
-            console.error('upload failed:', err);
+            console.error('Upload failed:', err);
         } else {
 
             if (body == "") {

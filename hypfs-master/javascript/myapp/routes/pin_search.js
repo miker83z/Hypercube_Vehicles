@@ -10,7 +10,7 @@ router.post('/pin_search', async function (req, res) {
     const point = req.body.keyword
     const threshold = req.body.threshold
     const encoded_point = utils.binToStr(utils.encode(point))
-    console.log("point:", point, "encoded_point:", encoded_point)
+    console.log("POINT:", point, "-->", "ENCODED POINT:", encoded_point)
 
 
     make_req(encoded_point, threshold, async function (data) {
@@ -21,6 +21,7 @@ router.post('/pin_search', async function (req, res) {
             console.log(roots)
             resultFetch = []
             //get data from MAM
+            console.log('Fetch data from the tangle. Please be patient...')
             for (const root of roots) {
 
                 await myModuleFetch.fetchData(root).then(function (res) {
@@ -28,6 +29,7 @@ router.post('/pin_search', async function (req, res) {
 
                 })
             }
+            console.log('DONE.')
             res.send(resultFetch)
 
         } else {
@@ -49,7 +51,7 @@ const make_req = async function (keyword, threshold, callback) {
     };
 
     request(options, function optionalCallback(err, httpResponse, body) {
-        console.log("request gone")
+        console.log("REQUEST PIN SEARCH DHT DONE.")
         if (err) {
             console.error('upload failed:', err);
         } else {
@@ -60,8 +62,6 @@ const make_req = async function (keyword, threshold, callback) {
                 callback(body)
             }
         }
-        console.log(body)
-
     })
 }
 

@@ -15,7 +15,6 @@ function generate_coord() {
     const R = config.location.METERS // meters
     var randomPoint = randomLocation.randomCirclePoint(P, R)
     randomPoint = OPC_conversion(randomPoint)
-    console.log("randomPoint", randomPoint)
     return randomPoint
 }
 
@@ -23,7 +22,6 @@ function generate_coord() {
 function OPC_conversion(point) {
     openLocationCode = new OpenLocationCode();
     var code = openLocationCode.encode(point.latitude, point.longitude, 6);
-    console.log("code:", code);
     return code
 
 }
@@ -49,15 +47,10 @@ function hashToBin(myString) {
     return bitStrigs
 }
 
-//Splits olc in array of 5 strings
-function split_olc(s) {    //NB: QUESTA VA MODIFICATA IN "6P00000000", "00H5000000"... E NON 6P, H5..
+//Splits olc in array of substrings 
+function split_olc(s) {
 
-    var splitted = []
     s = s.replace('+', '');
-    //splitted.push(olc.match(/(..?)/g))
-    //console.log(splitted[0])
-    //return splitted[0]
-
     const template = s.replace(/./g, '0');
     const res = [];
     for (let i = 0; i < s.length; i += 2) {
@@ -68,8 +61,9 @@ function split_olc(s) {    //NB: QUESTA VA MODIFICATA IN "6P00000000", "00H50000
         );
     }
     return res;
-}
 
+
+}
 
 
 //General function for olc conversion 
