@@ -19,8 +19,7 @@ router.post('/remove', async function (req, res) {
     };
 
     make_req(options, function (data) {
-        console.log("data", data)
-        res.send(data)
+        res.send({operation: "remove", point:  point, data: data})
     })
 
 })

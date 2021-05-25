@@ -5,7 +5,7 @@ const myModulePublish = require('../IOTA_services/publishMAM');
 const execute = myModulePublish.execute
 const utils = require('../utils')
 
-/* POST data into  DHT and MAM */
+/* Insert data in  DHT and MAM */
 
 router.post('/insert', async function (req, res) {
 
@@ -17,7 +17,7 @@ router.post('/insert', async function (req, res) {
   
   //request to DHT
   make_req(encoded_point, root, function (data) {
-    res.send(data)
+    res.send({operation: "insert", point: point, data: data})
   })
 });
 

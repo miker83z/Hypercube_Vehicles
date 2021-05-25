@@ -8,7 +8,6 @@ const provider = 'https://nodes.devnet.iota.org'
 const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encodeURIComponent(provider)}&mode=${mode}&root=`
 
 
-//NB: PER RECUPERARE TUTTI I MSG DEVI SCORRERE I ROOT
 fetchData = async (root) => {
 
     var fetches = []
@@ -30,4 +29,3 @@ fetchData = async (root) => {
 module.exports = { fetchData }
 //var channelID = 'PGQWQWKOTCIX9OONLSSOTRUGFCJZQMJJGHCBVFUVODAGQOSUGNWTQOWWKGZAABIWEUAD9WWLZVLMEJRQM'
 //fetchData(channelID)
-//findLocations()

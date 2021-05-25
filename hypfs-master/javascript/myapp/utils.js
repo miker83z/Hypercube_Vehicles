@@ -12,7 +12,7 @@ function generate_coord() {
         longitude: 11.342327
     }
 
-    const R = config.location.METERS // meters
+    const R = config.location.METERS 
     var randomPoint = randomLocation.randomCirclePoint(P, R)
     randomPoint = OPC_conversion(randomPoint)
     return randomPoint
@@ -34,7 +34,7 @@ function split_str(string) {
     return str_splitted
 }
 
-//Converts strings in array firstly to hashes and then to numbers
+//Converts strings firstly to hashes and then to numbers
 function hashToBin(myString) {
 
     bitStrigs = []

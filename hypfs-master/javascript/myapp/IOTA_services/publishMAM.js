@@ -1,4 +1,3 @@
-
 //Require MAM package from iota.js
 const Mam = require('@iota/mam')
 const { asciiToTrytes } = require('@iota/converter')
@@ -13,15 +12,12 @@ const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encode
 
 //Initialize MAM state object
 //mamState = Mam.init(provider, seed)
-
 mamState = Mam.init(provider)
-
 
 //Change MAM state to previous and change mode
 //Mam.changeMode(mamState, mode, secretKey)  ///////MODALITà RESTRICTED
 
 // Publish to tangle
-
 const publish = async (packet) => {
 
     // Create MAM Payload - STRING OF TRYTES

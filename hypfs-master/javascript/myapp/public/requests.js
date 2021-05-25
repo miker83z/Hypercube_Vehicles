@@ -39,13 +39,13 @@ global.choose_operation = function (operation) {
         case "superset_search":
 
             url = '/superset_search'
-            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": 5 })
+            data = JSON.stringify({ 'keyword': '8F000000+00', "threshold": 5 })
             break;
 
         case "remove":
 
             url = '/remove'
-            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "obj": "JTXBOI9PSLJQUQOEJHULRVHBFDOEFTGXZQZAGS9ZSUGXJTJFFKPN9PIQGWONMJXMIRAKLWIW9YSFICUU9" })
+            data = JSON.stringify({ 'keyword': '8FQJ3600+', "obj": "9MTZIQWB9Q9IONIEDDRY9MLMWWKCK9EVVSRZOKWAUETQYYJDRABPU9DSIV9LBSDBBXBADXGHJWTFSFVWQ" })
             break;
 
     }
