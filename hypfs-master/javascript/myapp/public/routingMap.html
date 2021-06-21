@@ -1,0 +1,184 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>GGL Leaflet Webmap </title>
+
+
+    <link rel="stylesheet" href="stylesheets/style.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+
+
+    <script type="text/javascript" src="../public/openLoc.js"></script>
+    <script type="text/javascript" src="path.js"></script>
+
+
+</head>
+
+<body>
+
+
+
+    <script src="bundle.js"></script>
+    <div id="map"></div>
+
+    <button id="createPath" onclick=create_path()>Insert path</button>
+
+
+
+</body>
+
+</html>
+
+<script>
+
+
+
+    //ADD MARKERS
+    var locations = [
+        ["LOCATION_1", 44.50394, 11.34884],
+        ["LOCATION_2", 44.50053, 11.35643],
+        ["LOCATION_3", 44.50504, 11.34408],
+        ["LOCATION_4", 44.50391, 11.33577],
+        ["LOCATION_5", 44.50527, 11.34265],
+        ["LOCATION_6", 44.50175, 11.33148],
+        ["LOCATION_7", 44.49989, 11.32779],
+        ["LOCATION_8", 44.4962, 11.32774],
+        ["LOCATION_9", 44.48832, 11.33434],
+
+    ];
+
+    /*
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            accessToken: 'pk.eyJ1IjoiZmVkZXJpY2EwOTYiLCJhIjoiY2tudTFjNDN6MDhmdjJ1cm1qZGZ4aW15eCJ9.3Pv_3Qn0oSh37OUCDSgWrg'
+        }).addTo(map);
+        */
+
+
+    var map = L.map('map').setView([44.496893, 11.342327], 7);
+
+    addMarkersPothole(locations)
+
+
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoiZmVkZXJpY2EwOTYiLCJhIjoiY2tudTFjNDN6MDhmdjJ1cm1qZGZ4aW15eCJ9.3Pv_3Qn0oSh37OUCDSgWrg'
+    }).addTo(map);
+
+    function create_path() {
+
+
+
+        routingCtrl = L.Routing.control({
+            waypoints: [
+                L.latLng(44.49602410415384, 11.344158990167367),
+                L.latLng(44.49642442068167, 11.345310968535694)
+            ],
+            lineOptions: {
+                styles: [
+                    { color: getRandomColor(), opacity: 1, weight: 5 }
+                ]
+            }
+
+
+        }).addTo(map);
+
+        routingCtrl.on('routeselected', function (routes) {
+            console.log(routes.route);
+            check_pothole(routes.route.coordinates)
+            //console.log(routes.route.instructions);
+        }, this);
+
+    }
+
+
+    function addMarkersPothole(locations) {
+
+        var markerArray = [];
+
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+
+        for (var i = 0; i < locations.length; i++) {
+            marker = new L.marker([locations[i][1], locations[i][2]], { icon: greenIcon })
+                .bindPopup(locations[i][0])
+                .addTo(map);
+        }
+    }
+
+    //ADD MARKERS
+
+    function check_pothole(route) {
+
+        for (var i = 0; i < locations.length; i++) {
+            for (var j = 0; j < route.length; j++) {
+                if (OpenLocationCode.encode(locations[i][1], locations[i][2], 10) == OpenLocationCode.encode(route[j].lat, route[j].lng, 10)) {
+                    console.log("MATCH", locations[i][0], "==", (route[j].lat, route[j].lng))
+
+                }
+
+            }
+        }
+        /*
+        for (var i = 0; i < locations.length; i++) {
+            for (var j = 0; j < route.length; j++) {
+                if ([locations[i][1] == route.lat, locations[i][2] = route.lng])
+                    console.log("MATCH")
+
+            }
+        }
+        */
+
+    }
+
+    function printJson() {
+        var mypath = []
+        mypath.push(path1, path2, path3, path4, path5)
+        mypath.forEach(element => {
+            var mydata = JSON.parse(JSON.stringify(element));
+            console.log(mydata)
+
+        });
+
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    printJson()
+
+
+</script>

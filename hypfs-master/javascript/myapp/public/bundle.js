@@ -98,6 +98,14 @@ function decodeOLC(code) {
     const coord = openLocationCode.decode(code)
     return coord
 
+
+}
+
+function encodeOLC(latlon) {
+    const openLocationCode = new OpenLocationCode();
+    var code = openLocationCode.encode(latlon);
+    return code
+
 }
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})

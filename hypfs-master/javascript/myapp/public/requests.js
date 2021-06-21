@@ -96,4 +96,7 @@ function decodeOLC(code) {
     const coord = openLocationCode.decode(code)
     return coord
 
+
 }
+
+
