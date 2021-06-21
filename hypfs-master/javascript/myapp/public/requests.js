@@ -1,5 +1,6 @@
 ///browserify requests.js -o bundle.js 
 var OpenLocationCode = require('open-location-code').OpenLocationCode
+var intersections = require('../test/intersections')
 function client_request(url, data, operation) {
 
     $.ajax({
@@ -8,6 +9,7 @@ function client_request(url, data, operation) {
         contentType: 'application/json',
         data: data,
         success: function (data) {
+            console.log("success")
             output_data(operation, data)
 
         },
@@ -23,6 +25,8 @@ global.choose_operation = function (operation) {
     var data;
 
     switch (operation) {
+ 
+            
         case "insert":
 
             url = '/insert'
@@ -59,6 +63,7 @@ global.output_data = function (operation, data) {
 
 
     switch (operation) {
+
         case "pin_search":
         case "superset_search":
 
@@ -97,6 +102,16 @@ function decodeOLC(code) {
     return coord
 
 
+}
+
+global.insert_intersections = function(operation){
+    console.log("funct", operation)
+
+    url = '/insertTest'
+    intersections.intersections.forEach(element => {
+        data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
+        client_request(url, data, operation)
+    });
 }
 
 

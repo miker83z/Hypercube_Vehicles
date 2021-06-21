@@ -2,6 +2,7 @@
 (function (global){(function (){
 ///browserify requests.js -o bundle.js 
 var OpenLocationCode = require('open-location-code').OpenLocationCode
+var intersections = require('../test/intersections')
 function client_request(url, data, operation) {
 
     $.ajax({
@@ -10,6 +11,7 @@ function client_request(url, data, operation) {
         contentType: 'application/json',
         data: data,
         success: function (data) {
+            console.log("success")
             output_data(operation, data)
 
         },
@@ -25,6 +27,8 @@ global.choose_operation = function (operation) {
     var data;
 
     switch (operation) {
+ 
+            
         case "insert":
 
             url = '/insert'
@@ -61,6 +65,7 @@ global.output_data = function (operation, data) {
 
 
     switch (operation) {
+
         case "pin_search":
         case "superset_search":
 
@@ -101,15 +106,180 @@ function decodeOLC(code) {
 
 }
 
-function encodeOLC(latlon) {
-    const openLocationCode = new OpenLocationCode();
-    var code = openLocationCode.encode(latlon);
-    return code
+global.insert_intersections = function(operation){
+    console.log("funct", operation)
 
+    url = '/insertTest'
+    intersections.intersections.forEach(element => {
+        data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
+        client_request(url, data, operation)
+    });
 }
 
+
+
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"open-location-code":2}],2:[function(require,module,exports){
+},{"../test/intersections":2,"open-location-code":4}],2:[function(require,module,exports){
+var paths = require('./path');
+
+
+
+mypath_label = ["path1", "path2", "path3", "path4", "path5"]
+mypath = [paths.path1, paths.path2, paths.path3, paths.path4, paths.path5]
+
+//cerco i punti in comuner tra i path
+intersections = []
+for (let i = 0; i < mypath.length; i++) {
+    for (let k = i + 1; k < mypath.length; k++) {
+
+        if (mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)) != "") {
+            console.log("Punti in comune:", mypath_label[i], mypath_label[k], mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)))
+
+            intersections.push(mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)))
+        }
+    }
+}
+
+//metto tutti gli elementi in comune in un unico arrat
+intersections = intersections.flat(1); //The depth level specifying how deep a nested array structure should be flattened. Defaults to 1.
+
+//rimuovo i duplicati prima di fare inserimento  marker pothole
+
+intersections = intersections.filter((thing, index, self) =>
+    index === self.findIndex((t) => (
+        t.lat === thing.lat && t.lng === thing.lng
+    ))
+)
+
+console.log("Intersezioni:", intersections)
+
+
+
+module.exports = {intersections}
+},{"./path":3}],3:[function(require,module,exports){
+path1 = [
+
+    {
+        "lat": 44.38755,
+        "lng": 11.63314
+    },
+    {
+        "lat": 44.3875,
+        "lng": 11.63316
+    },
+    {
+        "lat": 44.38707,
+        "lng": 11.63334
+    },
+    {
+        "lat": 44.38696,
+        "lng": 11.63336
+    }
+],
+    path2 = [
+
+        {
+            "lat": 44.43794,
+            "lng": 11.22212
+        },
+        {
+            "lat": 44.38696,
+            "lng": 11.63336
+        },
+        {
+            "lat": 44.43786,
+            "lng": 11.22246
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+  
+    ],
+    path3 = [
+        {
+            "lat": 44.29928,
+            "lng": 12.17796
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+        {
+            "lat": 44.29988,
+            "lng": 12.17813
+        },
+        {
+            "lat": 44.30023,
+            "lng": 12.17823
+        },
+   
+    ]
+path4 = [
+
+    {
+        "lat": 44.44746,
+        "lng": 10.94609
+    },
+    {
+        "lat": 44.44728,
+        "lng": 10.94594
+    },
+    {
+        "lat": 44.30028,
+        "lng": 12.17824
+    },
+    {
+        "lat": 44.44718,
+        "lng": 10.94586
+    },
+
+
+],
+    path5 = [
+
+        {
+            "lat": 44.50896,
+            "lng": 11.36254
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        }
+
+
+    ],
+    path6 = [
+
+        {
+            "lat": 44.50896,
+            "lng": 11.36254
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.43794,
+            "lng": 11.22212
+        },
+    ]
+
+
+module.exports = { path1, path2, path3, path4, path5, path6 }
+},{}],4:[function(require,module,exports){
 // Copyright 2014 Google Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the 'License');

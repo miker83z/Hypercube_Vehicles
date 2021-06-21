@@ -26,6 +26,14 @@ function OPC_conversion(point) {
 
 }
 
+//Coverts location points in OLC
+function OPC_conversion_manual(point) {
+    openLocationCode = new OpenLocationCode();
+    var code = openLocationCode.encode(point.lat, point.lng, 6);
+    return code
+
+}
+
 //Splits a strings based on commas 
 function split_str(string) {
 
@@ -88,4 +96,4 @@ function binToStr(arr) {
 
 
 
-module.exports = { split_str, generate_coord, hashToBin, encode, binToStr };
+module.exports = { split_str, generate_coord, hashToBin, encode, binToStr, OPC_conversion_manual };

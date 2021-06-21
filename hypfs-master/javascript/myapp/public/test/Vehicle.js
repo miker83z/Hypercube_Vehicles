@@ -12,20 +12,16 @@ class Vehicle {
         switch (num_percorso) {
             case 1:
                 return paths.path1
-
             case 2:
                 return paths.path2
-
             case 3:
                 return paths.path3
-
             case 4:
                 return paths.path4
-
             case 5:
-
                 return paths.path5
             case 6:
+                return paths.path6
             case 7:
             case 8:
             case 9:
@@ -34,11 +30,6 @@ class Vehicle {
             default:
             // code block
         }
-
-
-
-        //console.log("path",num_percorso)
-
 
     }
 }
