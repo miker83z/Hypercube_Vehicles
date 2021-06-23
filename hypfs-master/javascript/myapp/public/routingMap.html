@@ -70,7 +70,9 @@
         */
 
 
-    var map = L.map('map').setView([44.496893, 11.342327], 7);
+    //var map = L.map('map').setView([44.496893, 11.342327], 7); //BOLOGNA
+    var map = L.map('map').setView([  -10.688849544557804, -75.32228039205555], 7); //PERù
+  
 
     addMarkersPothole(locations)
 
@@ -91,8 +93,10 @@
 
         routingCtrl = L.Routing.control({
             waypoints: [
-                L.latLng(44.49602410415384, 11.344158990167367),
-                L.latLng(44.49642442068167, 11.345310968535694)
+               // L.latLng(44.49602410415384, 11.344158990167367), //BOLO
+               // L.latLng(44.49642442068167, 11.345310968535694)
+                L.latLng(-10.688849544557804, -75.32228039205555),
+                L.latLng(-10.688849544557804, -75.32228039205555)
             ],
             lineOptions: {
                 styles: [

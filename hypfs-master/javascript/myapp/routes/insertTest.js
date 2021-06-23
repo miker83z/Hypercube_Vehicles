@@ -9,7 +9,7 @@ const utils = require('../utils')
 
 router.post('/insertTest', async function (req, res) {
   
-  console.log("body server", req.body)
+  //console.log("body insert", req.body)
 
 
   point = utils.OPC_conversion_manual(req.body)
@@ -27,7 +27,8 @@ router.post('/insertTest', async function (req, res) {
 
 
 const make_req = async function (keyword, root, callback) {
-  console.log("REQUEST INSERT DHT DONE.")
+  console.log("INSERT MAM DONE.")
+  
   const options = {
     url: 'http://127.0.0.1:50001/insert',
     method: 'GET',
@@ -36,6 +37,7 @@ const make_req = async function (keyword, root, callback) {
   };
 
   request(options, function optionalCallback(err, httpResponse, body) {
+    console.log("REQUEST INSERT DHT DONE.")
 
     if (err) {
       return console.error('Upload failed:', err);

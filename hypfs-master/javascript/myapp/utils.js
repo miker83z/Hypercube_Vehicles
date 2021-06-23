@@ -12,7 +12,7 @@ function generate_coord() {
         longitude: 11.342327
     }
 
-    const R = config.location.METERS 
+    const R = config.location.METERS
     var randomPoint = randomLocation.randomCirclePoint(P, R)
     randomPoint = OPC_conversion(randomPoint)
     return randomPoint
@@ -22,15 +22,22 @@ function generate_coord() {
 function OPC_conversion(point) {
     openLocationCode = new OpenLocationCode();
     var code = openLocationCode.encode(point.latitude, point.longitude, 6);
+    //se la precisione è 6, tronco ultime due cifre che sono 00
+    code = code.slice(0, -3);
     return code
 
 }
 
 //Coverts location points in OLC
 function OPC_conversion_manual(point) {
+
     openLocationCode = new OpenLocationCode();
     var code = openLocationCode.encode(point.lat, point.lng, 6);
+    //se la precisione è 6, tronco ultime due cifre che sono 00
+    code = code.slice(0, -3);
+
     return code
+
 
 }
 
@@ -39,6 +46,7 @@ function split_str(string) {
 
     var str_splitted = new Array();
     str_splitted = string.split(",");
+    //console.log("split_str:", str_splitted)
     return str_splitted
 }
 
@@ -52,6 +60,7 @@ function hashToBin(myString) {
         bitStrigs.push(sixBitBinary)
 
     });
+    //console.log("hastToBin:", bitStrigs)
     return bitStrigs
 }
 
@@ -68,6 +77,7 @@ function split_olc(s) {
             + template.substring(i + 2)
         );
     }
+    //console.log('split_olc', res)
     return res;
 
 
@@ -78,7 +88,7 @@ function split_olc(s) {
 function encode(mystring) {
     splitted = split_olc(mystring)
     bitStrigs = hashToBin(splitted)
-    console.log(bitStrigs)
+    //console.log(bitStrigs)
     return bitStrigs
 
 }
@@ -91,8 +101,29 @@ function binToStr(arr) {
         ans = (ans | arr[i]);
     }
     ans = String(ans).padStart(config.dht.HIPERCUBE_SIZE, 0)
+    //console.log("binToStr:", ans)
     return ans;
 }
+
+/*
+var point = { 'lat': '-13.16429', 'lng': '-72.53975' }
+var point2 = { "lat": '44.44718', "lng": '10.94586' }
+var point3 = { 'lat': '38.17858', 'lng': '13.29995' }
+var point4 = { 'lat': '42.63164', 'lng': ' 25.4166' }
+
+var points = []
+points.push(point, point2, point3, point4)
+
+points.forEach(element => {
+    olc = OPC_conversion_manual(element)
+    const encoded_point = binToStr(encode(olc))
+    console.log("POINT:", olc, "-->", "ENCODED POINT:", encoded_point)
+    console.log('-------------------------')
+
+});
+
+*/
+
 
 
 

@@ -1,21 +1,15 @@
-//>browserify test_vehicles.js -o bundle_test.js
+//browserify test_vehicles.js -o bundle_test.js
 var Vehicle = require('./Vehicle.js')
+var intersections = require('./intersections.js')
 
-/*
-pathNames.forEach((pathName) =>
-    vehicles.push(new Vehicle(pathName)));
 
-vehicles.forEach((vehicle) => console.log(vehicle.num_percorso, vehicle.coord,))
-*/
-
+//Istanzio Array di veicoli da testare
 function init_vehicles() {
 
-    //const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
-    //const num_vehicles = [3, 3, 3, 3, 3, 3]  //num di veicoli da create
-
-    const pathNames = [1, 2];    //tipologie di veicoli
-    const num_vehicles = [3, 3]  //num di veicoli da create
-
+    const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
+    const num_vehicles = [3, 3, 3, 3, 3, 3]  //num di veicoli da create
+    //const pathNames = [1, 2];    //tipologie di veicoli
+    //const num_vehicles = [2, 2]  //num di veicoli da create
 
     let vehicles = [];
 
@@ -31,32 +25,76 @@ function init_vehicles() {
 
 }
 
-
-//console.log(vehicles[0].coord[0])
-//TODO: inserire dati su iota e calcolare latenza
+//Test insert
 
 
 global.start_insert_test = function () {
 
     vehicles = init_vehicles()
-    console.log("Test start");
+    console.log("Test started");
 
     vehicles.forEach(element => {
 
         var i = 0;
 
         (function loop() {
-            //console.log("------------------------");
-            //console.log("Tappa:", i, "-", "Tipo veicolo", element.num_percorso, element.coord[i])
-            var data = JSON.stringify({ 'lat': element.coord[i].lat, "lng": element.coord[i].lng })
-            insert_test_request(data)
+
+            contains(intersections.intersections, element.coord[i], element, i)
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 3000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 30000);  // call myself in 3 seconds time if required
             }
         })();
     });
 }
+
+
+//Funzione che verifica se la coord del veicolo coincide con un pothole
+
+function contains(markers, obj, element, tappa) {
+    var i = markers.length;
+    while (i--) {
+        if (markers[i].lat === obj.lat && markers[i].lng === obj.lng) {
+            // return a[i].lenm, a[i].lng;
+            console.log("Tipo veicolo:", element.num_percorso, "Tappa:", tappa, "Matches:", obj)
+
+            var data = JSON.stringify({ 'lat': obj.lat, "lng": obj.lng })
+            var url = "/insertTest"
+
+            test_request(data, url)
+
+        }
+    }
+    //return "false";
+}
+
+//Test supersetSearch
+
+global.start_search_test = function () {
+
+    vehicles = init_vehicles()
+    console.log("Test search started");
+
+    vehicles.forEach(element => {
+
+        var i = 0;
+
+        (function loop() {
+
+            console.log(element.coord[i], element.num_percorso)
+
+            var data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
+            var url = "/superset_search_test"
+
+            test_request(data, url)
+
+            if (++i < element.coord.length) {
+                setTimeout(loop, 60000);  // call myself in 3 seconds time if required
+            }
+        })();
+    });
+}
+
 
 /*
 var s = [0, 1, 2];
@@ -70,15 +108,18 @@ var i = 0;
     }
 })();      // above function expression is called immediately to start it off
 */
+var num_success = 0
+function test_request(data, url) {
 
-function insert_test_request(data) {
     $.ajax({
         type: 'POST',
-        url: "/insertTest",
+        url: url,
         contentType: 'application/json',
         data: data,
         success: function (data) {
-            console.log("success")
+            num_success = num_success + 1
+            console.log("success", num_success)
+            console.log("num messaggi:", data.data.length)
 
         },
         error: function (err) {
@@ -87,4 +128,5 @@ function insert_test_request(data) {
     });
 
 }
+
 

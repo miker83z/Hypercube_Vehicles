@@ -12,13 +12,14 @@ const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encode
 
 //Initialize MAM state object
 //mamState = Mam.init(provider, seed)
-mamState = Mam.init(provider)
+////////////////////////////////////////////    TODO: MODIFICA (SPOSTATO SOTTO)--> mamState = Mam.init(provider)
 
 //Change MAM state to previous and change mode
-//Mam.changeMode(mamState, mode, secretKey)  ///////MODALITà RESTRICTED
+
 
 // Publish to tangle
 const publish = async (packet) => {
+    mamState = Mam.init(provider)
 
     // Create MAM Payload - STRING OF TRYTES
     const trytes = asciiToTrytes(JSON.stringify(packet))
@@ -26,8 +27,9 @@ const publish = async (packet) => {
 
     // Save new mamState
     mamState = message.state
+    console.log(message.state)
     // Attach the payload
-    await Mam.attach(message.payload, message.address, 3, 9)
+    await Mam.attach(message.payload,  message.address, 3, 9)
 
     console.log('Published', packet, '\n');
     //console.log('Address', message.address, '\n')
@@ -44,6 +46,8 @@ const publish = async (packet) => {
 
 
 execute = async (code) => {
+
+
     const root = await publish({
         message: code,
         timestamp: (new Date()).toLocaleString()
