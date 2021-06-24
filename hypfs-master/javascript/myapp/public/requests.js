@@ -45,7 +45,7 @@ global.choose_operation = function (operation) {
         case "superset_search":
 
             url = '/superset_search'
-            data = JSON.stringify({ 'keyword': '8F000000+00', "threshold": 5 })
+            data = JSON.stringify({ 'keyword': '57 0000', "threshold": 5 })
             break;
 
         case "remove":
@@ -107,9 +107,9 @@ function decodeOLC(code) {
 }
 
 global.insert_intersections = function (operation) {
-    console.log("funct", operation)
+    console.log("Insert intersections")
 
-    url = '/insertTest'
+    url = '/insertIota'
     intersections.intersections.forEach(element => {
         data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
         client_request(url, data, operation)

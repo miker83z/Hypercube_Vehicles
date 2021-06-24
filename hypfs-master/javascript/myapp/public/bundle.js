@@ -12,7 +12,6 @@ function client_request(url, data, operation) {
         url: url,
         contentType: 'application/json',
         data: data,
-        //async: false, ///DA VEDERE
         success: function (data) {
             console.log("success")
             output_data(operation, data)
@@ -48,7 +47,7 @@ global.choose_operation = function (operation) {
         case "superset_search":
 
             url = '/superset_search'
-            data = JSON.stringify({ 'keyword': '8F000000+00', "threshold": 5 })
+            data = JSON.stringify({ 'keyword': '57 0000', "threshold": 5 })
             break;
 
         case "remove":
@@ -110,9 +109,9 @@ function decodeOLC(code) {
 }
 
 global.insert_intersections = function (operation) {
-    console.log("funct", operation)
+    console.log("Insert intersections")
 
-    url = '/insertTest'
+    url = '/insertIota'
     intersections.intersections.forEach(element => {
         data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
         client_request(url, data, operation)
@@ -142,7 +141,7 @@ for (let i = 0; i < mypath.length; i++) {
     }
 }
 
-//metto tutti gli elementi in comune in un unico arrat
+//metto tutti gli elementi in comune in un unico array
 intersections = intersections.flat(1); //The depth level specifying how deep a nested array structure should be flattened. Defaults to 1.
 
 //rimuovo i duplicati prima di fare inserimento  marker pothole

@@ -2,8 +2,8 @@ const { json } = require('body-parser');
 var express = require('express');
 var router = express.Router();
 const request = require('request');
-const myModuleFetch = require('../IOTA_services/fetch-data');
-const utils = require('../utils')
+const myModuleRequire = require('../IOTA_services/retrieve.js');
+const utils = require('../utils.js')
 
 
 router.post('/pin_search', async function (req, res) {
@@ -16,25 +16,25 @@ router.post('/pin_search', async function (req, res) {
     make_req(encoded_point, threshold, async function (data) {
 
         if (data != undefined) {
+            message_id_list = utils.split_str(data)
+            console.log("messsage_id  DHT", message_id_list, "point:", req.body.point)
 
-            roots = utils.split_str(data)
-            console.log(roots)
-            resultFetch = []
+            var resultFetch = []
             //get data from MAM
             console.log('Fetch data from the tangle. Please be patient...')
-            for (const root of roots) {
+             for (const message_id of message_id_list) {
 
-                await myModuleFetch.fetchData(root).then(function (res) {
+                await myModuleRequire.retrieve_message(message_id).then(function (res) {
                     resultFetch.push(res)
 
                 })
             }
-            console.log('DONE.')
-            res.send(resultFetch)
+            console.log('FETCH IOTA DONE.')
+            res.send({ 'data': resultFetch, "point": req.body.point })
 
         } else {
             console.log("no result found")
-            res.send("No result found")
+            res.send(false)
         }
     })
 

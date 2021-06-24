@@ -14,19 +14,28 @@ app.use(express.urlencoded({
 
 var index = require('./routes/index.js')
 var insert = require('./routes/insert.js')
-var insertTest = require('./routes/insertTest.js')
+var insertIota = require('./routes/insertTestIota.js')
+//var insertTestMam = require('./routes/insertTestMam.js')
+
 var superset_search = require('./routes/superset_search.js')
-var superset_search_test = require('./routes/superset_search_test')
+//var superset_search_test_mam = require('./routes/superset_search_test_mam.js')
+var superset_search_test_iota = require('./routes/superset_search_test_iota.js')
+
+
 var pin_search = require('./routes/pin_search.js')
 var remove = require('./routes/remove.js')
 
 app.use(index);
 app.use(insert);
-app.use(insertTest);
-app.use(superset_search)
-app.use(pin_search)
-app.use(remove)
-app.use(superset_search_test)
+//app.use(insertTestMam);
+app.use(insertIota);
+
+app.use(pin_search);
+app.use(remove);
+
+app.use(superset_search);
+app.use(superset_search_test_iota);
+//app.use(superset_search_test_mam);
 
 
 app.listen(config.web.port, () => {

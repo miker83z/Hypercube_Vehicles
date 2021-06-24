@@ -6,15 +6,15 @@ utils = require("../utils")
 router.post('/remove', async function (req, res) {
 
     point = req.body.keyword
-    root = req.body.obj
+    message_id = req.body.obj
     const encoded_point = utils.binToStr(utils.encode(point))
 
-    console.log(encoded_point, root)
+    console.log(encoded_point, message_id)
 
     const options = {
         url: 'http://127.0.0.1:50001/remove',
         method: 'GET',
-        qs: { 'keyword': encoded_point, "obj": root },
+        qs: { 'keyword': encoded_point, "obj": message_id },
         json: true
     };
 

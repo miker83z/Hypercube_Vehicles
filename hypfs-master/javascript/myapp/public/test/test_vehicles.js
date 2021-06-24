@@ -27,7 +27,6 @@ function init_vehicles() {
 
 //Test insert
 
-
 global.start_insert_test = function () {
 
     vehicles = init_vehicles()
@@ -45,6 +44,8 @@ global.start_insert_test = function () {
                 setTimeout(loop, 30000);  // call myself in 3 seconds time if required
             }
         })();
+
+        console.log("END TEST.")
     });
 }
 
@@ -59,7 +60,8 @@ function contains(markers, obj, element, tappa) {
             console.log("Tipo veicolo:", element.num_percorso, "Tappa:", tappa, "Matches:", obj)
 
             var data = JSON.stringify({ 'lat': obj.lat, "lng": obj.lng })
-            var url = "/insertTest"
+            //var url = "/insertTest"
+            var url = "/insertIota"
 
             test_request(data, url)
 
@@ -84,7 +86,7 @@ global.start_search_test = function () {
             console.log(element.coord[i], element.num_percorso)
 
             var data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
-            var url = "/superset_search_test"
+            var url = "/superset_search_iota"
 
             test_request(data, url)
 
@@ -119,7 +121,14 @@ function test_request(data, url) {
         success: function (data) {
             num_success = num_success + 1
             console.log("success", num_success)
-            console.log("num messaggi:", data.data.length)
+            if (data === false) {
+                console.log("No result found")
+
+            } else {
+                //console.log(data)
+                console.log("num messaggi:", data.data.length)
+            }
+
 
         },
         error: function (err) {
