@@ -8,8 +8,6 @@ const utils = require('../utils')
 
 router.post('/insertIota', async function (req, res) {
 
-  console.log("insert iota");
-
 
   point = utils.OPC_conversion_manual(req.body)
   const encoded_point = utils.binToStr(utils.encode(point))
@@ -20,7 +18,7 @@ router.post('/insertIota', async function (req, res) {
   //request to DHT
   make_req(encoded_point, message_id, function (data) {
 
-    res.send({ operation: "insert", point: point, data: data })
+    res.send({ operation: "insert", point: point, data: data, message_id: message_id })
   })
 
 });

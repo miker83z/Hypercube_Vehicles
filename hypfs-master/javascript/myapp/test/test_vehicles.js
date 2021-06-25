@@ -1,4 +1,5 @@
-//browserify test_vehicles.js -o bundle_test.js
+//browserify test_vehicles.js -o bundle_test.js  
+//browserify C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\test\test_vehicles.js > bundle_test.js
 var Vehicle = require('./Vehicle.js')
 var intersections = require('./intersections.js')
 
@@ -42,11 +43,14 @@ global.start_insert_test = function () {
 
             if (++i < element.coord.length) {
                 setTimeout(loop, 30000);  // call myself in 3 seconds time if required
+            }else{
+                console.log("END TEST.")
             }
         })();
 
-        console.log("END TEST.")
+
     });
+   
 }
 
 
@@ -63,7 +67,7 @@ function contains(markers, obj, element, tappa) {
             //var url = "/insertTest"
             var url = "/insertIota"
 
-            test_request(data, url)
+            test_request(data, url, "insert")
 
         }
     }
@@ -88,10 +92,13 @@ global.start_search_test = function () {
             var data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
             var url = "/superset_search_iota"
 
-            test_request(data, url)
+
+            test_request(data, url, "superset_search")
 
             if (++i < element.coord.length) {
                 setTimeout(loop, 60000);  // call myself in 3 seconds time if required
+            }else{
+                console.log("END TEST.")
             }
         })();
     });
@@ -111,7 +118,7 @@ var i = 0;
 })();      // above function expression is called immediately to start it off
 */
 var num_success = 0
-function test_request(data, url) {
+function test_request(data, url, operation) {
 
     $.ajax({
         type: 'POST',
@@ -125,8 +132,19 @@ function test_request(data, url) {
                 console.log("No result found")
 
             } else {
+
+                switch (operation) {
+                    case "insert":
+                        console.log(data)
+                        break;
+                    case "superset_search":
+                        console.log("num messaggi:", data.data.length)
+                        break;
+                    default:
+                    // code block
+                }
                 //console.log(data)
-                console.log("num messaggi:", data.data.length)
+
             }
 
 

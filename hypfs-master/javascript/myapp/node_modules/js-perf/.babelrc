@@ -1,0 +1,31 @@
+{
+  "env": {
+    "test": {
+      "presets": ["env"],
+      "plugins": [
+        "transform-object-assign",
+        "transform-runtime"
+      ]
+    },
+    "development": {
+      "presets": [
+        ["env", { "modules": false, "loose": true }]
+      ],
+      "plugins": [
+        "transform-object-assign"
+      ]
+    },
+    "production": {
+      "presets": [
+        ["env", { "modules": false, "loose": true }]
+      ],
+      "plugins": [
+        "external-helpers",
+        "transform-object-assign",
+        "transform-remove-debugger",
+        "transform-remove-console"
+      ]
+    }
+  }
+
+}
