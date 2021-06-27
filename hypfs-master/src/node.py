@@ -53,6 +53,7 @@ class Node:
         bit_keyword = keyword
         if one(bit_keyword) != one(self.id) and sender == 'user':
             neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
+            
             return request(neighbor, SUPERSET_SEARCH, {'keyword': keyword, 'threshold': threshold, 'sender': 'user'})
         else:
             results = []

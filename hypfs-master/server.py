@@ -4,15 +4,24 @@ from flask import Flask, request
 
 from src.config import *
 from src.node import Node, requests
-from src.utils import INSERT, REMOVE, PIN_SEARCH, SUPERSET_SEARCH
+from src.utils import INSERT, REMOVE, PIN_SEARCH, SUPERSET_SEARCH, reset_hops, get_hops
 
 from flask_cors import CORS, cross_origin
 from flask import jsonify
+from openpyxl import load_workbook
+from statistics import mean
 
 app = Flask(APP_NAME)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+################
+RESULTS_FILE = 'results/test_results.xlsx'
+SHEET_SUPERSET_PERF = 'superset_perf'
+FIRST_COLUMN = 2
+
+document = load_workbook(RESULTS_FILE)
+superset_sheet_perf = document[SHEET_SUPERSET_PERF]
 
 
 @app.route(INSERT)
@@ -22,8 +31,8 @@ def request_insert():
     print("argomenti", request.args)
     #keyword = int(request.args.get('keyword'))
     keyword = request.args.get('keyword')
-    print("key int", keyword)
     obj = request.args.get('obj')
+    print("KEY:", keyword, "OBJ:", obj)
     res = NODE.insert(keyword, obj)
     if type(res) is not str:
         res = res.text
@@ -59,13 +68,29 @@ def request_pin_search():
         res = ','.join(res)
     return res
 
-
+superset_hops = [] ######
+num_richieste = []#######
 @app.route(SUPERSET_SEARCH)
 def request_superset_search():
+
+    
     keyword = request.args.get('keyword')
     threshold = int(request.args.get('threshold'))
     sender = request.args.get('sender')
+
+    reset_hops()  
+
     res = NODE.superset_search(keyword, threshold, sender)
+    superset_hops.append(get_hops() +1 ) #########
+    num_richieste.append(1) ##########
+
+    #print("hops IN superset:", get_hops() +1)###########
+
+    print("stats", len(superset_hops), mean(superset_hops))
+    superset_sheet_perf.cell(row=2, column=FIRST_COLUMN ).value = sum(num_richieste) #########
+    superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=FIRST_COLUMN).value = mean(superset_hops) #########
+    
+    document.save(RESULTS_FILE)
     if type(res) is not list:
         res = res.text
     else:

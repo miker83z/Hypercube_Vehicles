@@ -204,6 +204,23 @@ path4 = [
     */
 
 path1 = [
+
+    {
+        "lat": 44.38755,
+        "lng": 11.63314
+    },
+    {
+        "lat": 44.3875,
+        "lng": 11.63316
+    },
+    {
+        "lat": 44.38707,
+        "lng": 11.63334
+    },
+    {
+        "lat": 44.38696,
+        "lng": 11.63336
+    },
     {
         "lat": -13.16429,
         "lng": -72.53975
@@ -247,6 +264,23 @@ path1 = [
             "lat": -13.22012,
             "lng": -72.35276
         },
+        {
+            "lat": 44.43794,
+            "lng": 11.22212
+        },
+        {
+            "lat": 44.38696,
+            "lng": 11.63336
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+
+        {
+            "lat": 44.43786,
+            "lng": 11.22246
+        }
 
     ],
     path3 = [
@@ -270,6 +304,22 @@ path1 = [
             "lat": -11.6679,
             "lng": -74.31387
         },
+        {
+            "lat": 44.29928,
+            "lng": 12.17796
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+        {
+            "lat": 44.29988,
+            "lng": 12.17813
+        },
+        {
+            "lat": 44.30023,
+            "lng": 12.17823
+        }
 
     ],
     path4 = [
@@ -292,6 +342,22 @@ path1 = [
         {
             "lat": -11.66782,
             "lng": -74.31465
+        },
+        {
+            "lat": 44.44746,
+            "lng": 10.94609
+        },
+        {
+            "lat": 44.44728,
+            "lng": 10.94594
+        },
+        {
+            "lat": 44.30028,
+            "lng": 12.17824
+        },
+        {
+            "lat": 44.44718,
+            "lng": 10.94586
         }
     ],
     path5 = [
@@ -315,6 +381,26 @@ path1 = [
             "lat": -10.65178,
             "lng": -75.38716
         },
+        {
+            "lat": 44.50896,
+            "lng": 11.36254
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.38755,
+            "lng": 11.63314
+        }
     ],
     path6 = [
         {
@@ -336,25 +422,41 @@ path1 = [
         {
             "lat": -11.66787,
             "lng": -74.31391
+        }, {
+            "lat": 44.44746,
+            "lng": 10.94609
         },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        }
     ]
 
 module.exports = { path1, path2, path3, path4, path5, path6 }
 },{}],4:[function(require,module,exports){
 (function (global){(function (){
 //browserify test_vehicles.js -o bundle_test.js  
-//browserify C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\test\test_vehicles.js > bundle_test.js
+//browserify C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\test\test_vehicles.js >C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\public\bundle_test.js
 var Vehicle = require('./Vehicle.js')
 var intersections = require('./intersections.js')
+
 
 
 //Istanzio Array di veicoli da testare
 function init_vehicles() {
 
-    const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
-    const num_vehicles = [3, 3, 3, 3, 3, 3]  //num di veicoli da create
-    //const pathNames = [1, 2];    //tipologie di veicoli
-    //const num_vehicles = [2, 2]  //num di veicoli da create
+    //const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
+    //const num_vehicles = [5, 5, 5, 5, 5, 5]  //num di veicoli da create
+    const pathNames = [1, 2, 3];    //tipologie di veicoli
+    const num_vehicles = [2, 2, 2]  //num di veicoli da create
 
     let vehicles = [];
 
@@ -374,8 +476,6 @@ function init_vehicles() {
 
 global.start_insert_test = function () {
 
-    console.log("browserify")
-
     vehicles = init_vehicles()
     console.log("Test started");
 
@@ -389,14 +489,15 @@ global.start_insert_test = function () {
 
             if (++i < element.coord.length) {
                 setTimeout(loop, 30000);  // call myself in 3 seconds time if required
-            }else{
+            } else {
                 console.log("END TEST.")
+
             }
         })();
 
 
     });
-   
+
 }
 
 
@@ -442,8 +543,8 @@ global.start_search_test = function () {
             test_request(data, url, "superset_search")
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 60000);  // call myself in 3 seconds time if required
-            }else{
+                setTimeout(loop, 30000);  // call myself in 3 seconds time if required
+            } else {
                 console.log("END TEST.")
             }
         })();

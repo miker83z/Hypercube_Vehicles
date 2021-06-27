@@ -1,431 +1,4 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-(function (global){(function (){
-///browserify requests.js -o bundle.js 
-var OpenLocationCode = require('open-location-code').OpenLocationCode
-var intersections = require('./test/intersections.js')
-
-
-function client_request(url, data, operation) {
-    console.log("data on client request", data)
-    $.ajax({
-        type: 'POST',
-        url: url,
-        contentType: 'application/json',
-        data: data,
-        success: function (data) {
-            console.log("success")
-            output_data(operation, data)
-
-        },
-        error: function (err) {
-            console.log("errore", err)
-        }
-    });
-
-}
-
-global.choose_operation = function (operation) {
-    var url;
-    var data;
-
-    switch (operation) {
-
-
-        case "insert":
-
-            url = '/insert'
-            //data = JSON.stringify({ 'keyword': 3, "obj": point })
-
-            break;
-        case "pin_search":
-
-
-            url = '/pin_search'
-            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": -1 })
-
-            break;
-        case "superset_search":
-
-            url = '/superset_search'
-            data = JSON.stringify({ 'keyword': '57 0000', "threshold": 5 })
-            break;
-
-        case "remove":
-
-            url = '/remove'
-            data = JSON.stringify({ 'keyword': '8FQJ3600+', "obj": "9MTZIQWB9Q9IONIEDDRY9MLMWWKCK9EVVSRZOKWAUETQYYJDRABPU9DSIV9LBSDBBXBADXGHJWTFSFVWQ" })
-            break;
-
-    }
-    client_request(url, data, operation)
-
-}
-
-
-global.output_data = function (operation, data) {
-    console.log(data)
-
-
-    switch (operation) {
-
-        case "pin_search":
-        case "superset_search":
-
-            var messages = []
-            for (i = 0; i < data.length; i++) {
-                for (j = 0; j < data[i].length; j++) {
-                    console.log(data[i][j])
-                    messages.push(data[i][j])
-                }
-            }
-
-            for (element of messages) {
-                //console.log(element)
-
-                coord = decodeOLC(element.message)
-                L.marker([coord.latitudeCenter, coord.longitudeCenter]).addTo(layerGroup);
-                //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
-            }
-
-            break;
-
-        case "clear":
-            // remove all the markers in one go
-            layerGroup.clearLayers();
-            break;
-        default:
-            break;
-
-    }
-}
-
-function decodeOLC(code) {
-
-    const openLocationCode = new OpenLocationCode();
-    const coord = openLocationCode.decode(code)
-    return coord
-
-
-}
-
-global.insert_intersections = function (operation) {
-    console.log("Insert intersections")
-
-    url = '/insertIota'
-    intersections.intersections.forEach(element => {
-        data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
-        client_request(url, data, operation)
-    });
-}
-
-
-
-}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./test/intersections.js":2,"open-location-code":4}],2:[function(require,module,exports){
-var paths = require('./path');
-
-
-mypath_label = ["path1", "path2", "path3", "path4", "path5", "path6"]
-mypath = [paths.path1, paths.path2, paths.path3, paths.path4, paths.path5, paths.path6]
-
-//cerco i punti in comuner tra i path
-intersections = []
-for (let i = 0; i < mypath.length; i++) {
-    for (let k = i + 1; k < mypath.length; k++) {
-
-        if (mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)) != "") {
-            //console.log("Punti in comune:", mypath_label[i], mypath_label[k], mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)))
-
-            intersections.push(mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)))
-        }
-    }
-}
-
-//metto tutti gli elementi in comune in un unico array
-intersections = intersections.flat(1); //The depth level specifying how deep a nested array structure should be flattened. Defaults to 1.
-
-//rimuovo i duplicati prima di fare inserimento  marker pothole
-
-intersections = intersections.filter((thing, index, self) =>
-    index === self.findIndex((t) => (
-        t.lat === thing.lat && t.lng === thing.lng
-    ))
-)
-
-console.log("Intersezioni:", intersections)
-
-
-
-module.exports = {intersections}
-},{"./path":3}],3:[function(require,module,exports){
-
-/*
-path1 = [
-
-    {
-        "lat": 44.38755,
-        "lng": 11.63314
-    },
-    {
-        "lat": 44.3875,
-        "lng": 11.63316
-    },
-    {
-        "lat": 44.38707,
-        "lng": 11.63334
-    },
-    {
-        "lat": 44.38696,
-        "lng": 11.63336
-    }
-],
-    path2 = [
-
-        {
-            "lat": 44.43794,
-            "lng": 11.22212
-        },
-        {
-            "lat": 44.38696,
-            "lng": 11.63336
-        },
-        {
-            "lat": 44.4378,
-            "lng": 11.22261
-        },
-
-        {
-            "lat": 44.43786,
-            "lng": 11.22246
-        }
-        
-  
-    ],
-    path3 = [
-        {
-            "lat": 44.29928,
-            "lng": 12.17796
-        },
-        {
-            "lat": 44.4378,
-            "lng": 11.22261
-        },
-        {
-            "lat": 44.29988,
-            "lng": 12.17813
-        },
-        {
-            "lat": 44.30023,
-            "lng": 12.17823
-        },
-
-    ]
-path4 = [
-
-    {
-        "lat": 44.44746,
-        "lng": 10.94609
-    },
-    {
-        "lat": 44.44728,
-        "lng": 10.94594
-    },
-    {
-        "lat": 44.30028,
-        "lng": 12.17824
-    },
-    {
-        "lat": 44.44718,
-        "lng": 10.94586
-    }
-
-
-],
-    path5 = [
-
-        {
-            "lat": 44.50896,
-            "lng": 11.36254
-        },
-        {
-            "lat": 44.50926,
-            "lng": 11.36232
-        },
-        {
-            "lat": 44.44693,
-            "lng": 10.94565
-        },
-        {
-            "lat": 44.50926,
-            "lng": 11.36232
-        },
-        {
-            "lat": 44.38755,
-            "lng": 11.63314
-        }
-
-    ],
-    path6 = [
-
-        {
-            "lat": 44.44746,
-            "lng": 10.94609
-        },
-        {
-            "lat": 44.44693,
-            "lng": 10.94565
-        },
-        {
-            "lat": 44.50926,
-            "lng": 11.36232
-        },
-        {
-            "lat": 44.4378,
-            "lng": 11.22261
-        }
-
-    ]
-
-    */
-
-path1 = [
-    {
-        "lat": -13.16429,
-        "lng": -72.53975
-    },
-    {
-        "lat": -13.16422,
-        "lng": -72.53984
-    },
-    {
-        "lat": -13.16414,
-        "lng": -72.53996
-    },
-    {
-        "lat": -13.16409,
-        "lng": -72.54007
-    },
-    {
-        "lat": -12.42964,
-        "lng": -72.64603
-    },
-
-],
-    path2 = [
-        {
-            "lat": -13.21918,
-            "lng": -72.35374
-        },
-        {
-            "lat": -13.16429,
-            "lng": -72.53975
-        },
-        {
-            "lat": -13.2194,
-            "lng": -72.35355
-        },
-        {
-            "lat": -13.21973,
-            "lng": -72.35318
-        },
-        {
-            "lat": -13.22012,
-            "lng": -72.35276
-        },
-
-    ],
-    path3 = [
-        {
-            "lat": -12.42964,
-            "lng": -72.64603
-        },
-        {
-            "lat": -12.42969,
-            "lng": -72.64576
-        },
-        {
-            "lat": -12.4299,
-            "lng": -72.64519
-        },
-        {
-            "lat": -12.42994,
-            "lng": -72.64471
-        },
-        {
-            "lat": -11.6679,
-            "lng": -74.31387
-        },
-
-    ],
-    path4 = [
-        {
-            "lat": -11.6679,
-            "lng": -74.31387
-        },
-        {
-            "lat": -11.66787,
-            "lng": -74.31391
-        },
-        {
-            "lat": -11.66782,
-            "lng": -74.31413
-        },
-        {
-            "lat": -10.68663,
-            "lng": -75.31367
-        },
-        {
-            "lat": -11.66782,
-            "lng": -74.31465
-        }
-    ],
-    path5 = [
-        {
-            "lat": -10.68663,
-            "lng": -75.31367
-        },
-        {
-            "lat": -10.68642,
-            "lng": -75.31385
-        },
-        {
-            "lat": -10.68635,
-            "lng": -75.31395
-        },
-        {
-            "lat": -10.68635,
-            "lng": -75.31395
-        },
-        {
-            "lat": -10.65178,
-            "lng": -75.38716
-        },
-    ],
-    path6 = [
-        {
-            "lat": -10.65178,
-            "lng": -75.38716
-        },
-        {
-            "lat": -10.64928,
-            "lng": -75.38694
-        },
-        {
-            "lat": -10.64603,
-            "lng": -75.38727
-        },
-        {
-            "lat": -10.64603,
-            "lng": -75.38727
-        },
-        {
-            "lat": -11.66787,
-            "lng": -74.31391
-        },
-    ]
-
-module.exports = { path1, path2, path3, path4, path5, path6 }
-},{}],4:[function(require,module,exports){
 // Copyright 2014 Google Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the 'License');
@@ -1145,4 +718,532 @@ var OpenLocationCode = function () {};
 
 
 exports.OpenLocationCode = OpenLocationCode;
-},{}]},{},[1]);
+},{}],2:[function(require,module,exports){
+(function (global){(function (){
+///browserify requests.js -o bundle.js 
+var OpenLocationCode = require('open-location-code').OpenLocationCode
+var intersections = require('../test/intersections.js')
+
+
+function client_request(url, data, operation) {
+    console.log("data on client request", data)
+    $.ajax({
+        type: 'POST',
+        url: url,
+        contentType: 'application/json',
+        data: data,
+        success: function (data) {
+            console.log("success")
+            output_data(operation, data)
+
+        },
+        error: function (err) {
+            console.log("errore", err)
+        }
+    });
+
+}
+
+global.choose_operation = function (operation) {
+    var url;
+    var data;
+
+    switch (operation) {
+
+
+        case "insert":
+
+            url = '/insert'
+            //data = JSON.stringify({ 'keyword': 3, "obj": point })
+
+            break;
+        case "pin_search":
+
+
+            url = '/pin_search'
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": -1 })
+
+            break;
+        case "superset_search":
+
+            url = '/superset_search'
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": 5 })
+            break;
+
+        case "remove":
+
+            url = '/remove'
+            data = JSON.stringify({ 'keyword': '8FQJ3600+', "obj": "9MTZIQWB9Q9IONIEDDRY9MLMWWKCK9EVVSRZOKWAUETQYYJDRABPU9DSIV9LBSDBBXBADXGHJWTFSFVWQ" })
+            break;
+
+    }
+    client_request(url, data, operation)
+
+}
+
+
+global.output_data = function (operation, data) {
+    console.log(data)
+
+
+    switch (operation) {
+
+        case "pin_search":
+        case "superset_search":
+
+            var messages = []
+            for (i = 0; i < data.length; i++) {
+                for (j = 0; j < data[i].length; j++) {
+                    console.log(data[i][j])
+                    messages.push(data[i][j])
+                }
+            }
+
+            for (element of messages) {
+                //console.log(element)
+
+                coord = decodeOLC(element.message)
+                L.marker([coord.latitudeCenter, coord.longitudeCenter]).addTo(layerGroup);
+                //marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+            }
+
+            break;
+
+        case "clear":
+            // remove all the markers in one go
+            layerGroup.clearLayers();
+            break;
+        default:
+            break;
+
+    }
+}
+
+function decodeOLC(code) {
+
+    const openLocationCode = new OpenLocationCode();
+    const coord = openLocationCode.decode(code)
+    return coord
+
+
+}
+
+global.insert_intersections = function (operation) {
+    console.log("Insert intersections")
+
+    url = '/insertIota'
+    intersections.intersections.forEach(element => {
+        data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
+        client_request(url, data, operation)
+    });
+}
+
+
+
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../test/intersections.js":3,"open-location-code":1}],3:[function(require,module,exports){
+var paths = require('./path');
+
+
+mypath_label = ["path1", "path2", "path3", "path4", "path5", "path6"]
+mypath = [paths.path1, paths.path2, paths.path3, paths.path4, paths.path5, paths.path6]
+
+//cerco i punti in comuner tra i path
+intersections = []
+for (let i = 0; i < mypath.length; i++) {
+    for (let k = i + 1; k < mypath.length; k++) {
+
+        if (mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)) != "") {
+            //console.log("Punti in comune:", mypath_label[i], mypath_label[k], mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)))
+
+            intersections.push(mypath[i].filter(item1 => mypath[k].some(item2 => item1.lat === item2.lat && item1.lng === item2.lng)))
+        }
+    }
+}
+
+//metto tutti gli elementi in comune in un unico array
+intersections = intersections.flat(1); //The depth level specifying how deep a nested array structure should be flattened. Defaults to 1.
+
+//rimuovo i duplicati prima di fare inserimento  marker pothole
+
+intersections = intersections.filter((thing, index, self) =>
+    index === self.findIndex((t) => (
+        t.lat === thing.lat && t.lng === thing.lng
+    ))
+)
+
+console.log("Intersezioni:", intersections)
+
+
+
+module.exports = {intersections}
+},{"./path":4}],4:[function(require,module,exports){
+
+/*
+path1 = [
+
+    {
+        "lat": 44.38755,
+        "lng": 11.63314
+    },
+    {
+        "lat": 44.3875,
+        "lng": 11.63316
+    },
+    {
+        "lat": 44.38707,
+        "lng": 11.63334
+    },
+    {
+        "lat": 44.38696,
+        "lng": 11.63336
+    }
+],
+    path2 = [
+
+        {
+            "lat": 44.43794,
+            "lng": 11.22212
+        },
+        {
+            "lat": 44.38696,
+            "lng": 11.63336
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+
+        {
+            "lat": 44.43786,
+            "lng": 11.22246
+        }
+        
+  
+    ],
+    path3 = [
+        {
+            "lat": 44.29928,
+            "lng": 12.17796
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+        {
+            "lat": 44.29988,
+            "lng": 12.17813
+        },
+        {
+            "lat": 44.30023,
+            "lng": 12.17823
+        },
+
+    ]
+path4 = [
+
+    {
+        "lat": 44.44746,
+        "lng": 10.94609
+    },
+    {
+        "lat": 44.44728,
+        "lng": 10.94594
+    },
+    {
+        "lat": 44.30028,
+        "lng": 12.17824
+    },
+    {
+        "lat": 44.44718,
+        "lng": 10.94586
+    }
+
+
+],
+    path5 = [
+
+        {
+            "lat": 44.50896,
+            "lng": 11.36254
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.38755,
+            "lng": 11.63314
+        }
+
+    ],
+    path6 = [
+
+        {
+            "lat": 44.44746,
+            "lng": 10.94609
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        }
+
+    ]
+
+    */
+
+path1 = [
+
+    {
+        "lat": 44.38755,
+        "lng": 11.63314
+    },
+    {
+        "lat": 44.3875,
+        "lng": 11.63316
+    },
+    {
+        "lat": 44.38707,
+        "lng": 11.63334
+    },
+    {
+        "lat": 44.38696,
+        "lng": 11.63336
+    },
+    {
+        "lat": -13.16429,
+        "lng": -72.53975
+    },
+    {
+        "lat": -13.16422,
+        "lng": -72.53984
+    },
+    {
+        "lat": -13.16414,
+        "lng": -72.53996
+    },
+    {
+        "lat": -13.16409,
+        "lng": -72.54007
+    },
+    {
+        "lat": -12.42964,
+        "lng": -72.64603
+    },
+
+],
+    path2 = [
+        {
+            "lat": -13.21918,
+            "lng": -72.35374
+        },
+        {
+            "lat": -13.16429,
+            "lng": -72.53975
+        },
+        {
+            "lat": -13.2194,
+            "lng": -72.35355
+        },
+        {
+            "lat": -13.21973,
+            "lng": -72.35318
+        },
+        {
+            "lat": -13.22012,
+            "lng": -72.35276
+        },
+        {
+            "lat": 44.43794,
+            "lng": 11.22212
+        },
+        {
+            "lat": 44.38696,
+            "lng": 11.63336
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+
+        {
+            "lat": 44.43786,
+            "lng": 11.22246
+        }
+
+    ],
+    path3 = [
+        {
+            "lat": -12.42964,
+            "lng": -72.64603
+        },
+        {
+            "lat": -12.42969,
+            "lng": -72.64576
+        },
+        {
+            "lat": -12.4299,
+            "lng": -72.64519
+        },
+        {
+            "lat": -12.42994,
+            "lng": -72.64471
+        },
+        {
+            "lat": -11.6679,
+            "lng": -74.31387
+        },
+        {
+            "lat": 44.29928,
+            "lng": 12.17796
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        },
+        {
+            "lat": 44.29988,
+            "lng": 12.17813
+        },
+        {
+            "lat": 44.30023,
+            "lng": 12.17823
+        }
+
+    ],
+    path4 = [
+        {
+            "lat": -11.6679,
+            "lng": -74.31387
+        },
+        {
+            "lat": -11.66787,
+            "lng": -74.31391
+        },
+        {
+            "lat": -11.66782,
+            "lng": -74.31413
+        },
+        {
+            "lat": -10.68663,
+            "lng": -75.31367
+        },
+        {
+            "lat": -11.66782,
+            "lng": -74.31465
+        },
+        {
+            "lat": 44.44746,
+            "lng": 10.94609
+        },
+        {
+            "lat": 44.44728,
+            "lng": 10.94594
+        },
+        {
+            "lat": 44.30028,
+            "lng": 12.17824
+        },
+        {
+            "lat": 44.44718,
+            "lng": 10.94586
+        }
+    ],
+    path5 = [
+        {
+            "lat": -10.68663,
+            "lng": -75.31367
+        },
+        {
+            "lat": -10.68642,
+            "lng": -75.31385
+        },
+        {
+            "lat": -10.68635,
+            "lng": -75.31395
+        },
+        {
+            "lat": -10.68635,
+            "lng": -75.31395
+        },
+        {
+            "lat": -10.65178,
+            "lng": -75.38716
+        },
+        {
+            "lat": 44.50896,
+            "lng": 11.36254
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.38755,
+            "lng": 11.63314
+        }
+    ],
+    path6 = [
+        {
+            "lat": -10.65178,
+            "lng": -75.38716
+        },
+        {
+            "lat": -10.64928,
+            "lng": -75.38694
+        },
+        {
+            "lat": -10.64603,
+            "lng": -75.38727
+        },
+        {
+            "lat": -10.64603,
+            "lng": -75.38727
+        },
+        {
+            "lat": -11.66787,
+            "lng": -74.31391
+        }, {
+            "lat": 44.44746,
+            "lng": 10.94609
+        },
+        {
+            "lat": 44.44693,
+            "lng": 10.94565
+        },
+        {
+            "lat": 44.50926,
+            "lng": 11.36232
+        },
+        {
+            "lat": 44.4378,
+            "lng": 11.22261
+        }
+    ]
+
+module.exports = { path1, path2, path3, path4, path5, path6 }
+},{}]},{},[2]);

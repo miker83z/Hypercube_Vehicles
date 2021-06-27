@@ -1,6 +1,6 @@
 ///browserify requests.js -o bundle.js 
 var OpenLocationCode = require('open-location-code').OpenLocationCode
-var intersections = require('./test/intersections.js')
+var intersections = require('../test/intersections.js')
 
 
 function client_request(url, data, operation) {
@@ -45,7 +45,7 @@ global.choose_operation = function (operation) {
         case "superset_search":
 
             url = '/superset_search'
-            data = JSON.stringify({ 'keyword': '57 0000', "threshold": 5 })
+            data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": 5 })
             break;
 
         case "remove":

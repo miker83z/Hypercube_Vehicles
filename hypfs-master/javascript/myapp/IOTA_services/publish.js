@@ -28,6 +28,8 @@ function run() {
 
 }
 
+var times = []
+var num_req = 0;
 
 async function publish_msg(point) {
     const client = run()
@@ -52,12 +54,26 @@ async function publish_msg(point) {
     //TEST
     var publishIotaEndTime = new Date().getTime();
     //console.log("Publish Iota" + ": " + (publishIotaEndTime - publishIotaStartTime) + "ms")
-    fs.appendFileSync(path, publishIotaEndTime - publishIotaStartTime + '\n', 'UTF-8')
+
+    update_file(publishIotaEndTime - publishIotaStartTime)
+
+
+    //fs.appendFileSync(path, publishIotaEndTime - publishIotaStartTime + '\n', 'UTF-8')
     //TEST
     return message_id
 
 }
 
+
+function update_file(time){
+    num_req += 1
+    times.push(time) 
+    fs.writeFile(path, '', function(){console.log('File clean')})
+    const sum = times.reduce((a, b) => a + b, 0);
+    const avg = (sum / times.length) || 0;
+    fs.appendFileSync(path,"Latenza media:" + avg + '\n', 'UTF-8')
+   
+}
 
 module.exports = { publish_msg }
 

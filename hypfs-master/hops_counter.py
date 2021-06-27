@@ -9,7 +9,7 @@ HOPS = 0
 def increase_hops():
     global HOPS
     HOPS += 1
-    print(HOPS)
+    print("increased:", HOPS)
     return 'success'
 
 
@@ -17,12 +17,17 @@ def increase_hops():
 def reset_hops():
     global HOPS
     HOPS = 0
+    print("reset",HOPS)
     return 'success'
 
 
 @app.route(GET_HOPS)
 def get_hops():
+   
+    print("gethops:", str(HOPS))
     return str(HOPS)
+   
+    
 
 
 if __name__ == '__main__':
