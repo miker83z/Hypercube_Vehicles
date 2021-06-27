@@ -1,17 +1,23 @@
-const jwt_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMkQzS29vV050M2JIc0c5UDNUVFNMUzRBcmM3amFNWEV4YjZKZ2h6QWNZWm12Q0htdndQIiwianRpIjoiMTYyMjUzNzI0NSIsImlhdCI6MTYyMjUzNzI0NSwiaXNzIjoiMTJEM0tvb1dOdDNiSHNHOVAzVFRTTFM0QXJjN2phTVhFeGI2SmdoekFjWVptdkNIbXZ3UCIsIm5iZiI6MTYyMjUzNzI0NSwic3ViIjoiSE9STkVUIiwiZGFzaGJvYXJkIjpmYWxzZSwiYXBpIjp0cnVlfQ.klH2srjR-zOak4pH5b9TqC1jGkEeLg_neQiVYOGGxks"
+const { ClientBuilder } = require('@iota/client');
+const config = require('../config')
+const write = require('./write.js')
+
+var num_req = 0;
+
 
 async function retrieve_message(message_id) {
-    const { ClientBuilder } = require('@iota/client');
 
     // client will connect to testnet by default
     const client = new ClientBuilder()
-    .primaryNode('https://iota.mywaver.it:443', { jwt: jwt_key })
-    .localPow(false)
-    .build();
+        .primaryNode(config.iota.URL_NODE, { jwt: config.iota.KEY_JWT })
+        .localPow(false)
+        .build();
 
     //client.getInfo().then(console.log).catch(console.error)
     var decodedMsg;
-   
+    //TEST
+    var fetchIotaStartTime = new Date().getTime();
+    //TEST
 
     await client.getMessage().data(message_id).then(data => {
 
@@ -25,6 +31,13 @@ async function retrieve_message(message_id) {
     }).catch(err => {
         console.log(err)
     })
+
+    //TEST
+    var fetchIotaEndTime = new Date().getTime();
+    //console.log("Publish Iota" + ": " + (publishIotaEndTime - publishIotaStartTime) + "ms")
+    num_req += 1
+    write.writeFile(num_req, fetchIotaEndTime - fetchIotaStartTime, "retrieve_test_iota")
+    //TEST
 
     return decodedMsg
 

@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 from flask import Flask, request
 
 from src.config import *
@@ -70,26 +71,36 @@ def request_pin_search():
 
 superset_hops = [] ######
 num_richieste = []#######
+latency_superset = []######LAT
+
 @app.route(SUPERSET_SEARCH)
 def request_superset_search():
 
-    
     keyword = request.args.get('keyword')
     threshold = int(request.args.get('threshold'))
     sender = request.args.get('sender')
 
     reset_hops()  
 
+    start = time.time() #####LAT
+
     res = NODE.superset_search(keyword, threshold, sender)
+
+    end = time.time() - start ######LAT
+    print('{:.6f}s for the calculation'.format(end)) #LAT
+
     superset_hops.append(get_hops() +1 ) #########
     num_richieste.append(1) ##########
+    latency_superset.append(end)
 
     #print("hops IN superset:", get_hops() +1)###########
 
     print("stats", len(superset_hops), mean(superset_hops))
     superset_sheet_perf.cell(row=2, column=FIRST_COLUMN ).value = sum(num_richieste) #########
     superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=FIRST_COLUMN).value = mean(superset_hops) #########
+    superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=3).value = mean(latency_superset) #########
     
+
     document.save(RESULTS_FILE)
     if type(res) is not list:
         res = res.text
