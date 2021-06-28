@@ -2,9 +2,6 @@ const { ClientBuilder } = require('@iota/client');
 const write = require('./write.js')
 const config = require('../config')
 
-const path = "C:/Users/Amministratore/Desktop/IOTA_DHT//hypfs-master/javascript/myapp/public/test_files/insert_iota_latency.csv"
-
-
 function run() {
 
     /*

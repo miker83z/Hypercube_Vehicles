@@ -43,7 +43,7 @@ class Client:
         try:
             self.ipfs.get(obj, target=DOWNLOAD_FOLDER)
             res = "OBJECT '{}' DOWNLOADED".format(obj)
-            log(self.id, 'GET', res)
+            #log(self.id, 'GET', res)
         except Exception:
             res = "OBJECT '{}' NOT FOUND".format(obj)
             log(self.id, 'GET', res)
@@ -67,7 +67,7 @@ class Client:
         keyword = final_keyword(str(keyword))
         res = get_response(request(create_binary_id(self.server), SUPERSET_SEARCH, {'keyword': str(keyword), 'threshold': threshold, 'sender': 'user'}).text)
         if len(res) > 0:
-            log(self.id, SUPERSET_SEARCH[1:], '{}'.format(res))
+            #log(self.id, SUPERSET_SEARCH[1:], '{}'.format(res))
         else:
             res = []
             log(self.id, SUPERSET_SEARCH[1:], 'NO RESULTS FOUND')

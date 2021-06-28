@@ -10,8 +10,8 @@ function init_vehicles() {
 
     //const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
     //const num_vehicles = [5, 5, 5, 5, 5, 5]  //num di veicoli da create
-    const pathNames = [1, 2, 3];    //tipologie di veicoli
-    const num_vehicles = [2, 2, 2]  //num di veicoli da create
+    const pathNames = [1 ];    //tipologie di veicoli
+    const num_vehicles = [1 ]  //num di veicoli da create
 
     let vehicles = [];
 

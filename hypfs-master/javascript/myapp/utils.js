@@ -51,13 +51,19 @@ function split_str(string) {
 }
 
 //Converts strings firstly to hashes and then to numbers
+//Converts strings firstly to hashes and then to numbers
 function hashToBin(myString) {
 
     bitStrigs = []
     myString.forEach(element => {
-        var hash = mod(element)
-        var sixBitBinary = hash.toString(2).padStart(config.dht.HIPERCUBE_SIZE, 0)
-        bitStrigs.push(sixBitBinary)
+
+        if (/^0*$/.test(element) == false) { // check if string contains anly 0
+
+            var hash = mod(element)
+            //console.log(hash)
+            var sixBitBinary = hash.toString(2).padStart(config.dht.HIPERCUBE_SIZE, 0)
+            bitStrigs.push(sixBitBinary)
+        }
 
     });
     //console.log("hastToBin:", bitStrigs)
@@ -98,7 +104,9 @@ function binToStr(arr) {
     let ans = arr[0];
     // Traverse the array compute AND
     for (let i = 0; i < arr.length; i++) {
-        ans = (ans | arr[i]);
+        ans = (parseInt(ans, 2)  |  parseInt(arr[i], 2) ).toString(2)
+        //ans = ans | arr[i]
+  
     }
     ans = String(ans).padStart(config.dht.HIPERCUBE_SIZE, 0)
     //console.log("binToStr:", ans)

@@ -28,8 +28,6 @@ superset_sheet_perf = document[SHEET_SUPERSET_PERF]
 @app.route(INSERT)
 
 def request_insert():
-    print("argomenti", request)
-    print("argomenti", request.args)
     #keyword = int(request.args.get('keyword'))
     keyword = request.args.get('keyword')
     obj = request.args.get('obj')
@@ -79,25 +77,25 @@ def request_superset_search():
     keyword = request.args.get('keyword')
     threshold = int(request.args.get('threshold'))
     sender = request.args.get('sender')
+    #reset_hops()  
 
-    reset_hops()  
+    #TODO: QUI ESEGUO FUNZIONE CHE RESETTA NODO GLOBALE
 
     start = time.time() #####LAT
 
     res = NODE.superset_search(keyword, threshold, sender)
-
     end = time.time() - start ######LAT
-    print('{:.6f}s for the calculation'.format(end)) #LAT
-
-    superset_hops.append(get_hops() +1 ) #########
+    #print('{:.6f}s for the calculation'.format(end)) #LAT
+    #print("NUM HOPS:", get_hops()+ 1, "KEYWORD:", keyword)
+    #superset_hops.append(get_hops() +1 ) #########
     num_richieste.append(1) ##########
     latency_superset.append(end)
 
     #print("hops IN superset:", get_hops() +1)###########
 
-    print("stats", len(superset_hops), mean(superset_hops))
+    #print("stats", len(superset_hops), mean(superset_hops))
     superset_sheet_perf.cell(row=2, column=FIRST_COLUMN ).value = sum(num_richieste) #########
-    superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=FIRST_COLUMN).value = mean(superset_hops) #########
+    #superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=FIRST_COLUMN).value = mean(superset_hops) #########
     superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=3).value = mean(latency_superset) #########
     
 

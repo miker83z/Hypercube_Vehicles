@@ -14,7 +14,9 @@ GET_HOPS = '/get_hops'
 
 
 def request(neighbor, operation, params={}):
+    #TODO: QUI INCREMENTO IL CONTATORE DI HOPS
     increase_hops()
+    #get_hops()
     url = "http://{}:{}{}".format(LOCAL_HOST, str(get_decimal(neighbor) + INIT_PORT), operation)
     return requests.get(url=url, params=params)
 

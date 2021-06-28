@@ -13,8 +13,9 @@ class Node:
     def insert(self, keyword, obj):
         #bit_keyword = create_binary_id(keyword)
         bit_keyword = str(keyword)
-        print(bit_keyword)
+              
         if bit_keyword == self.id:
+           
             if obj not in self.objects:
                 with self.lock:
                     self.objects.append(obj)
@@ -22,6 +23,7 @@ class Node:
             else:
                 return 'failure'
         else:
+       
             neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
             return request(neighbor, INSERT, {'keyword': str(keyword), 'obj': obj})
 
@@ -49,13 +51,20 @@ class Node:
             return request(neighbor, PIN_SEARCH, {'keyword': str(keyword), 'threshold': threshold})
 
     def superset_search(self, keyword, threshold, sender):
+
+        
+
         #bit_keyword = create_binary_id(keyword)
         bit_keyword = keyword
-        if one(bit_keyword) != one(self.id) and sender == 'user':
+        print("Nodo contattato:", self.id)
+        print("Bitkey:", bit_keyword)
+        if bit_keyword != self.id and sender == 'user':
+            print("contatto vicino")
             neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
             
             return request(neighbor, SUPERSET_SEARCH, {'keyword': keyword, 'threshold': threshold, 'sender': 'user'})
         else:
+            print("uguale", "sender:", sender)
             results = []
             objects = self.get_objects(threshold)
             results.extend(objects)
