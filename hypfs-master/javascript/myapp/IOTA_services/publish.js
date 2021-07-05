@@ -1,5 +1,4 @@
 const { ClientBuilder } = require('@iota/client');
-const write = require('./write.js')
 const config = require('../config')
 
 function run() {
@@ -25,15 +24,13 @@ function run() {
 }
 
 
-var num_req = 0;
-
 async function publish_msg(point) {
-    const client = run()
 
+    const client = run()
     var message_id = "";
 
     //TEST
-    var publishIotaStartTime = new Date().getTime();
+    publishIotaStartTime = new Date().getTime();
     //TEST
 
     try {
@@ -47,26 +44,10 @@ async function publish_msg(point) {
         console.log(err);
     }
 
-    //TEST
-    var publishIotaEndTime = new Date().getTime();
-    //console.log("Publish Iota" + ": " + (publishIotaEndTime - publishIotaStartTime) + "ms")
-    num_req += 1
-    write.writeFile(num_req, publishIotaEndTime - publishIotaStartTime, "insert_test_iota")
-    //TEST
     return message_id
 
 }
 
-/*
-function update_file(time){
-   
-    times.push(time) 
-    fs.writeFile(path, '', function(){console.log('File clean')})
-    const sum = times.reduce((a, b) => a + b, 0);
-    const avg = (sum / times.length) || 0;
-    fs.appendFileSync(path,"Latenza media:" + avg + '\n', 'UTF-8')
-   
-}
-*/
+
 module.exports = { publish_msg }
 

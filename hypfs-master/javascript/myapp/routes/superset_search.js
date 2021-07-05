@@ -3,6 +3,9 @@ var router = express.Router();
 const request = require('request');
 const myModuleRequire = require('../IOTA_services/retrieve.js');
 const utils = require('../utils.js')
+const config = require('../config.js')
+
+const NODES = 2 ** config.dht.HIPERCUBE_SIZE
 
 
 router.post('/superset_search', async function (req, res) {
@@ -43,9 +46,9 @@ router.post('/superset_search', async function (req, res) {
 
 
 const make_req = async function (keyword, threshold, callback) {
-
+    const server = Math.floor(Math.random() * (NODES)) + 50000;     
     const options = {
-        url: 'http://127.0.0.1:50001/superset_search',
+        url: 'http://127.0.0.1:'+ server+ '/superset_search',
         method: 'GET',
         qs: { 'keyword': keyword, "threshold": threshold, 'sender': 'user' },
         json: true

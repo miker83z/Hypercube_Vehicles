@@ -2,6 +2,7 @@ const randomLocation = require('random-location')
 var OpenLocationCode = require('open-location-code').OpenLocationCode;
 var config = require('./config');
 var mod = require('hash-mod')(config.dht.HIPERCUBE_SIZE);
+const fs = require('fs')
 
 
 //Creates and converts random points in OLC
@@ -104,9 +105,9 @@ function binToStr(arr) {
     let ans = arr[0];
     // Traverse the array compute AND
     for (let i = 0; i < arr.length; i++) {
-        ans = (parseInt(ans, 2)  |  parseInt(arr[i], 2) ).toString(2)
+        ans = (parseInt(ans, 2) | parseInt(arr[i], 2)).toString(2)
         //ans = ans | arr[i]
-  
+
     }
     ans = String(ans).padStart(config.dht.HIPERCUBE_SIZE, 0)
     //console.log("binToStr:", ans)
@@ -134,5 +135,15 @@ points.forEach(element => {
 
 
 
+function write_csv(start_time, end_time, path) {
 
-module.exports = { split_str, generate_coord, hashToBin, encode, binToStr, OPC_conversion_manual };
+    //console.log(end_time - start_time)
+    fs.appendFile(path, end_time - start_time +'\n', function (err) {
+        if (err) throw err;
+        //console.log('Thanks, It\'s saved to the file!');
+    });
+
+}
+
+
+module.exports = { split_str, generate_coord, hashToBin, encode, binToStr, OPC_conversion_manual, write_csv };

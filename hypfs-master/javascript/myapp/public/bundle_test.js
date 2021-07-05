@@ -628,10 +628,8 @@ var intersections = require('./intersections.js')
 //Istanzio Array di veicoli da testare
 function init_vehicles() {
 
-    //const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
-    //const num_vehicles = [5, 5, 5, 5, 5, 5]  //num di veicoli da create
-    const pathNames = [1 ];    //tipologie di veicoli
-    const num_vehicles = [1 ]  //num di veicoli da create
+    const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
+    const num_vehicles = [5, 5, 5, 5, 5, 5]  //num di veicoli da create
 
     let vehicles = [];
 
@@ -653,7 +651,7 @@ global.start_insert_test = function () {
 
     vehicles = init_vehicles()
     console.log("Test started");
-
+    
     vehicles.forEach(element => {
 
         var i = 0;
@@ -663,7 +661,7 @@ global.start_insert_test = function () {
             contains(intersections.intersections, element.coord[i], element, i)
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 30000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 2*60*1000);  // call myself in 3 seconds time if required
             } else {
                 console.log("END TEST.")
 
@@ -718,7 +716,7 @@ global.start_search_test = function () {
             test_request(data, url, "superset_search")
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 30000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 2*60*1000);  // call myself in 3 seconds time if required
             } else {
                 console.log("END TEST.")
             }
@@ -761,6 +759,8 @@ function test_request(data, url, operation) {
                         break;
                     case "superset_search":
                         console.log("num messaggi:", data.data.length)
+                        console.log( data.data)
+
                         break;
                     default:
                     // code block

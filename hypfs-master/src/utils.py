@@ -3,6 +3,7 @@ import requests
 
 from src.config import LOCAL_HOST, HYPERCUBE_SIZE, INIT_PORT, HOP_SERVER_PORT
 
+
 NODES = 2 ** HYPERCUBE_SIZE
 INSERT = '/insert'
 REMOVE = '/remove'
@@ -12,11 +13,14 @@ INCREASE_HOPS = '/increase_hops'
 RESET_HOPS = '/reset_hops'
 GET_HOPS = '/get_hops'
 
+WRITE_FILE = '/write_file'
+
+
 
 def request(neighbor, operation, params={}):
-    #TODO: QUI INCREMENTO IL CONTATORE DI HOPS
+
     increase_hops()
-    #get_hops()
+
     url = "http://{}:{}{}".format(LOCAL_HOST, str(get_decimal(neighbor) + INIT_PORT), operation)
     return requests.get(url=url, params=params)
 

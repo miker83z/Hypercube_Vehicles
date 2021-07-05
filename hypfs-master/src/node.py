@@ -51,17 +51,13 @@ class Node:
             return request(neighbor, PIN_SEARCH, {'keyword': str(keyword), 'threshold': threshold})
 
     def superset_search(self, keyword, threshold, sender):
-
-        
+        print("nodo contattato", self.id)
 
         #bit_keyword = create_binary_id(keyword)
         bit_keyword = keyword
-        print("Nodo contattato:", self.id)
-        print("Bitkey:", bit_keyword)
+    
         if bit_keyword != self.id and sender == 'user':
-            print("contatto vicino")
             neighbor = self.hypercube.get_shortest_path(self.id, bit_keyword)[1]
-            
             return request(neighbor, SUPERSET_SEARCH, {'keyword': keyword, 'threshold': threshold, 'sender': 'user'})
         else:
             print("uguale", "sender:", sender)
