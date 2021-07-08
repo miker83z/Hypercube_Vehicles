@@ -31,7 +31,7 @@ const publish = async (packet) => {
     // Attach the payload
     await Mam.attach(message.payload,  message.address, 3, 9)
 
-    console.log('Published', packet, '\n');
+    //console.log('Published', packet, '\n');
     //console.log('Address', message.address, '\n')
 
     /*

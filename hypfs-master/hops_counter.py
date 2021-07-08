@@ -4,6 +4,12 @@ from src.utils import *
 from openpyxl import load_workbook
 from statistics import mean
 
+import csv
+PATH_HOPS = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/hops/'
+# open the file in the write mode
+
+print(NODES)
+
 app = Flask('hops_counter')
 HOPS = 0
 
@@ -37,11 +43,19 @@ num_richieste = []#######
 @app.route(GET_HOPS)
 def get_hops():
     print("GET HOPS", HOPS)
+    '''
+    with open(PATH_HOPS + 'superset_'+ HYPERCUBE_SIZE+'.csv', 'a',newline='') as f:
+    # create the csv writer
+    writer = csv.writer(f)
+    writer.writerow([HOPS)
+    '''
+    '''
     superset_hops.append(HOPS)
     num_richieste.append(1)
     superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=3 ).value = sum(num_richieste) #########
     superset_sheet_perf.cell(row=HYPERCUBE_SIZE, column=FIRST_COLUMN).value = mean(superset_hops) #########
     document.save(RESULTS_FILE)
+    '''
     return str(HOPS)
 
 

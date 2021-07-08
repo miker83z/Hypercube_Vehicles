@@ -1,18 +1,26 @@
 var express = require('express');
 var router = express.Router();
 const request = require('request');
-const myModuleFetch = require('../IOTA_services/fetch-data');
+const myModuleFetch = require('../MAM_services/fetch-data.js');
 const utils = require('../utils.js')
 const config = require('../config.js')
 
+const filepathMAM = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_fetch_MAM/retrieve.csv"
+
+
 const NODES = 2 ** config.dht.HIPERCUBE_SIZE
+var fetchMAMStartTime = 0
+var fetchMAMEndTime = 0
 
 
 router.post('/superset_search_mam', async function (req, res) {
-    const point = req.body.keyword
-    const threshold = req.body.threshold
+   
+    point = utils.OPC_conversion_manual(req.body.point)
+    threshold = req.body.threshold
     const encoded_point = utils.binToStr(utils.encode(point))
     console.log("POINT:", point, "-->", "ENCODED POINT:", encoded_point)
+
+    console.log("requ")
 
     make_req(encoded_point, threshold, async function (data) {
 
@@ -24,6 +32,7 @@ router.post('/superset_search_mam', async function (req, res) {
             //get data from MAM
             console.log('Fetch data from the tangle. Please be patient...')
 
+            fetchMAMStartTime = new Date().getTime();
             for (const root of roots) {
 
                 await myModuleFetch.fetchData(root).then(function (res) {
@@ -31,6 +40,13 @@ router.post('/superset_search_mam', async function (req, res) {
 
                 })
             }
+
+
+            fetchMAMEndTime = new Date().getTime();
+            utils.write_csv(fetchMAMStartTime, fetchMAMEndTime, filepathMAM)
+
+           
+
             console.log('DONE.')
             res.send(resultFetch)
         } else {
@@ -43,7 +59,7 @@ router.post('/superset_search_mam', async function (req, res) {
 
 
 const make_req = async function (keyword, threshold, callback) {
-  
+
     const server = Math.floor(Math.random() * (NODES)) + 50000; 
   
     const options = {

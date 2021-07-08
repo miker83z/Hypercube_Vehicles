@@ -7,14 +7,14 @@ function run() {
     const client = new ClientBuilder()
         //.node('https://iota.mywaver.it:443', {'jwt': jwt_string} )
         .node('https://api.lb-0.testnet.chrysalis2.com')
-        .localPow(false)
+        .localPow(config.iota.LOCAL_POW)
         .build();
     */
 
 
     const client = new ClientBuilder()
         .primaryNode(config.iota.URL_NODE, { jwt: config.iota.KEY_JWT })
-        .localPow(false) //Pow  done in remote
+        .localPow(config.iota.LOCAL_POW) //if false Pow  done in remote
         .build();
 
 

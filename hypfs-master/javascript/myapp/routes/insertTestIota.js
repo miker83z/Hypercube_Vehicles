@@ -6,7 +6,7 @@ const utils = require('../utils')
 const config = require('../config.js')
 
 const file_path_DHT = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_DHT/insert_dht_" + config.dht.HIPERCUBE_SIZE + ".csv"
-const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_ "+ config.iota.MODE + "_node_iota.csv"
+const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_"+ config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
 
 
 
@@ -42,7 +42,7 @@ router.post('/insertIota', async function (req, res) {
   make_req(encoded_point, message_id, function (data) {
 
     insertEndTime = new Date().getTime()
-    utils.write_csv(insertStartTime, insertEndTime, file_path_DHT)
+    //utils.write_csv(insertStartTime, insertEndTime, file_path_DHT)
 
     res.send({ operation: "insert", point: point, data: data, message_id: message_id })
 

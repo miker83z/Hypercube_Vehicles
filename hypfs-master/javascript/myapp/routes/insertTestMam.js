@@ -1,25 +1,39 @@
 var express = require('express');
 var router = express.Router();
 const request = require('request');
-const myModulePublish = require('../IOTA_services/publishMAM');
+const myModulePublish = require('../MAM_services/publishMAM');
 const execute = myModulePublish.execute
 const utils = require('../utils')
+const config = require('../config.js')
 
+const filepathMam = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_fetch_MAM/publish.csv"
+
+const NODES = 2 ** config.dht.HIPERCUBE_SIZE
+var publishMAMStartTime = 0
+var publishMAMEndTime = 0
 /* Insert data in  DHT and MAM */
 
-router.post('/insertTest', async function (req, res) {
+router.post('/insertTestMam', async function (req, res) {
   
-  //console.log("body insert", req.body)
+  console.log("insert test MAM")
 
 
   point = utils.OPC_conversion_manual(req.body)
   const encoded_point = utils.binToStr(utils.encode(point))
   console.log("POINT:", point, "-->", "ENCODED POINT:", encoded_point)
 
+
+  publishMAMStartTime = new Date().getTime();
   var root = await execute(point)
+
+  publishMAMEndTime = new Date().getTime();
+
+  utils.write_csv(publishMAMStartTime, publishMAMEndTime, filepathMam)
+  
 
   //request to DHT
   make_req(encoded_point, root, function (data) {
+    console.log("ok")
     res.send({ operation: "insert", point: point, data: data })
   })
  
@@ -27,10 +41,13 @@ router.post('/insertTest', async function (req, res) {
 
 
 const make_req = async function (keyword, root, callback) {
+  
+  const server = Math.floor(Math.random() * (NODES)) + 50000;
+ 
   console.log("INSERT MAM DONE.")
   
   const options = {
-    url: 'http://127.0.0.1:50001/insert',
+    url: config.web.LOCAL_HOST +':' + server + '/insert',
     method: 'GET',
     qs: { 'keyword': keyword, "obj": root },
     json: true

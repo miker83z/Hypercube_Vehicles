@@ -6,14 +6,18 @@ const utils = require('../utils.js')
 const config = require('../config.js')
 
 
-const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/retrieve_IOTA/retrieve_"+ config.iota.MODE +"_node_iota.csv"
-const filepath_DHT = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/superset_DHT/superset_" + config.dht.HIPERCUBE_SIZE + ".csv"
+const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/retrieve_IOTA/retrieve_"+config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
+
+
+const filepath_DHT = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/superset_DHT/superset_"+config.dht.HIPERCUBE_SIZE + ".csv"
 const NODES = 2 ** config.dht.HIPERCUBE_SIZE
 var fetchIotaStartTime = 0
 var fetchIotaEndTime = 0
 var hops_counter = []
 
 router.post('/superset_search_iota', async function (req, res) {
+
+    
 
     point = utils.OPC_conversion_manual(req.body.point)
     threshold = req.body.threshold
@@ -23,9 +27,10 @@ router.post('/superset_search_iota', async function (req, res) {
     supersetStartTime = new Date().getTime()
 
     make_req(encoded_point, threshold, async function (data) {
+      
 
         supersetEndTime = new Date().getTime()
-        utils.write_csv(supersetStartTime, supersetEndTime, filepath_DHT)
+        //utils.write_csv(supersetStartTime, supersetEndTime, filepath_DHT)
 
 
         if (data != undefined) {
@@ -40,7 +45,7 @@ router.post('/superset_search_iota', async function (req, res) {
             fetchIotaStartTime = new Date().getTime();
 
             for (const message_id of message_id_list) {
-
+               
                 await myModuleRequire.retrieve_message(message_id).then(function (res) {
                     resultFetch.push(res)
                 })
@@ -48,7 +53,9 @@ router.post('/superset_search_iota', async function (req, res) {
 
 
             fetchIotaEndTime = new Date().getTime();
+      
             utils.write_csv(fetchIotaStartTime, fetchIotaEndTime, filepath)
+      
 
             console.log('FETCH IOTA DONE.')
             res.send({ 'data': resultFetch, "point": req.body.point })
@@ -80,12 +87,12 @@ const make_req = async function (keyword, threshold, callback) {
     };
 
     
-    var x = new Date().getTime();
+
     request(options, function optionalCallback(err, httpResponse, body) {
     
         get_hops()
-        var y =  new Date().getTime() - x
-        console.log("TIME", y, body)
+        
+        
 
         console.log("REQUEST SUPERSET SEARCH DHT DONE.")
         if (err) {

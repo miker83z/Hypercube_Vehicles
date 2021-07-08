@@ -9,7 +9,7 @@ var intersections = require('./intersections.js')
 function init_vehicles() {
 
     const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
-    const num_vehicles = [5, 5, 5, 5, 5, 5]  //num di veicoli da create
+    const num_vehicles = [10, 10, 10, 10, 10, 10]  //num di veicoli da create
 
     let vehicles = [];
 
@@ -41,7 +41,7 @@ global.start_insert_test = function () {
             contains(intersections.intersections, element.coord[i], element, i)
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 2*60*1000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 3*60*1000);  // call myself in 3 seconds time if required
             } else {
                 console.log("END TEST.")
 
