@@ -4,8 +4,8 @@ const { asciiToTrytes } = require('@iota/converter')
 
 //MAM setup
 const mode = 'public'
-//const provider = 'https://nodes.devnet.iota.org'
-const provider = 'https://thetangle.org/nodes/'
+const provider = 'https://nodes.devnet.iota.org'
+//const provider = 'https://thetangle.org/nodes/'
 const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encodeURIComponent(provider)}&mode=${mode}&root=`
 
 // Publish to tangle

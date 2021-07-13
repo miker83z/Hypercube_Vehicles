@@ -3,7 +3,7 @@ const Iota = require('@iota/core');
 const Mam = require('@iota/mam')
 const { trytesToAscii } = require('@iota/converter');
 const mode = 'public'
-const provider = 'https://nodes.mainnet.iota.org'
+const provider = 'https://nodes.devnet.iota.org'
 
 mamState = Mam.init(provider)
 fetchData = async (root) => {
