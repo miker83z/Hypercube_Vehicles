@@ -6,16 +6,13 @@ const utils = require('../utils')
 const config = require('../config.js')
 
 const file_path_DHT = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_DHT/insert_dht_" + config.dht.HIPERCUBE_SIZE + ".csv"
-const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_"+ config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
-const file_path_mainnet = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_mainnet_"+ config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
-
-
+const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_" + config.iota.MODE + "_pow_" + config.iota.LOCAL_POW + "_node_iota.csv"
+const file_path_mainnet = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_mainnet_" + config.iota.MODE + "_pow_" + config.iota.LOCAL_POW + "_node_iota.csv"
 
 const NODES = 2 ** config.dht.HIPERCUBE_SIZE
 
 var insertStartTime = 0
 var insertEndTime = 0
-
 var publishIotaStartTime = 0
 var publishIotaEndTime = 0
 
@@ -24,14 +21,14 @@ var publishIotaEndTime = 0
 
 router.post('/insertIota', async function (req, res) {
 
-
+  //convert location in OLC
   point = utils.OPC_conversion_manual(req.body)
   const encoded_point = utils.binToStr(utils.encode(point))
   console.log("POINT:", point, "-->", "ENCODED POINT:", encoded_point)
 
-
   publishIotaStartTime = new Date().getTime();
 
+  //Publish point in Tangle
   var message_id = await myModulePublish.publish_msg(point)
 
   publishIotaEndTime = new Date().getTime();
@@ -40,6 +37,7 @@ router.post('/insertIota', async function (req, res) {
 
   insertStartTime = new Date().getTime()
 
+  //Publish id transaction in DHT
   make_req(encoded_point, message_id, function (data) {
 
     insertEndTime = new Date().getTime()
@@ -61,7 +59,7 @@ const make_req = async function (keyword, message_id, callback) {
   console.log("INSERT IOTA DONE.")
 
   const options = {
-    url: config.web.LOCAL_HOST +':' + server + '/insert',
+    url: config.web.LOCAL_HOST + ':' + server + '/insert',
     method: 'GET',
     qs: { 'keyword': keyword, "obj": message_id },
     json: true

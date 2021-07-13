@@ -2,7 +2,6 @@
 var OpenLocationCode = require('open-location-code').OpenLocationCode
 var intersections = require('../test/intersections.js')
 
-
 function client_request(url, data, operation) {
     console.log("data on client request", data)
     $.ajax({
@@ -21,6 +20,7 @@ function client_request(url, data, operation) {
     });
 
 }
+//Single test
 
 global.choose_operation = function (operation) {
     var url;
@@ -28,15 +28,12 @@ global.choose_operation = function (operation) {
 
     switch (operation) {
 
-
+        //Random point
         case "insert":
-
             url = '/insert'
-            //data = JSON.stringify({ 'keyword': 3, "obj": point })
-
+            
             break;
         case "pin_search":
-
 
             url = '/pin_search'
             data = JSON.stringify({ 'keyword': '8FXX4275+WC', "threshold": -1 })
@@ -62,7 +59,6 @@ global.choose_operation = function (operation) {
 
 global.output_data = function (operation, data) {
     console.log(data)
-
 
     switch (operation) {
 
@@ -97,19 +93,20 @@ global.output_data = function (operation, data) {
     }
 }
 
+
 function decodeOLC(code) {
 
     const openLocationCode = new OpenLocationCode();
     const coord = openLocationCode.decode(code)
     return coord
 
-
 }
 
+//Insert transactions in DHT 
 global.insert_intersections = function (operation) {
     console.log("Insert intersections")
 
-    url = '/insertIota'
+    url = '/insertTestMam'
     intersections.intersections.forEach(element => {
         data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
         client_request(url, data, operation)

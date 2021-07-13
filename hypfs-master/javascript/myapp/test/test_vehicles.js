@@ -5,15 +5,14 @@ var intersections = require('./intersections.js')
 
 
 
-//Istanzio Array di veicoli da testare
+//Init vehicles for testing
 function init_vehicles() {
 
-    const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
-    const num_vehicles = [10, 10, 10, 10, 10, 10]  //num di veicoli da create
+    const pathNames = [1, 2, 3, 4, 5, 6];    //types of vehicles
+    const num_vehicles = [10, 10, 10, 10, 10, 10]  //num of vehicles
 
-    //const pathNames = [1];    //tipologie di veicoli
+    //const pathNames = [1];    
     //const num_vehicles = [1]  
-
 
     let vehicles = [];
 
@@ -29,8 +28,7 @@ function init_vehicles() {
 
 }
 
-//Test insert
-
+//Start insert test
 global.start_insert_test = function () {
 
     vehicles = init_vehicles()
@@ -45,7 +43,7 @@ global.start_insert_test = function () {
             contains(intersections.intersections, element.coord[i], element, i)
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 3*60*1000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 3*60*1000);  // call  in 3 seconds time
             } else {
                 console.log("END TEST.")
 
@@ -58,18 +56,15 @@ global.start_insert_test = function () {
 }
 
 
-//Funzione che verifica se la coord del veicolo coincide con un pothole
-
+//check if the coordinates coincide with the pathole
 function contains(markers, obj, element, tappa) {
     var i = markers.length;
     while (i--) {
         if (markers[i].lat === obj.lat && markers[i].lng === obj.lng) {
-            // return a[i].lenm, a[i].lng;
             console.log("Tipo veicolo:", element.num_percorso, "Tappa:", tappa, "Matches:", obj)
 
             var data = JSON.stringify({ 'lat': obj.lat, "lng": obj.lng })
-            //var url = "/insertTest"
-            var url = "/insertIota"
+            var url = "/insertTestMam"
 
             test_request(data, url, "insert")
 
@@ -78,8 +73,7 @@ function contains(markers, obj, element, tappa) {
     //return "false";
 }
 
-//Test supersetSearch
-
+//Test start superset Search
 global.start_search_test = function () {
 
     vehicles = init_vehicles()
@@ -88,19 +82,17 @@ global.start_search_test = function () {
     vehicles.forEach(element => {
 
         var i = 0;
-
         (function loop() {
 
             console.log(element.coord[i], element.num_percorso)
 
             var data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
-            var url = "/superset_search_iota"
-
+            var url = "/superset_search_mam"
 
             test_request(data, url, "superset_search")
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 3*60*1000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 3*60*1000);  // call in 3 seconds time if required
             } else {
                 console.log("END TEST.")
             }
@@ -109,18 +101,6 @@ global.start_search_test = function () {
 }
 
 
-/*
-var s = [0, 1, 2];
-var i = 0;
-
-
-(function loop() {
-    console.log(s[i])
-    if (++i < s.length) {
-        setTimeout(loop, 3000);  // call myself in 3 seconds time if required
-    }
-})();      // above function expression is called immediately to start it off
-*/
 var num_success = 0
 function test_request(data, url, operation) {
 
@@ -149,17 +129,12 @@ function test_request(data, url, operation) {
                     default:
                     // code block
                 }
-                //console.log(data)
-
             }
-
-
         },
         error: function (err) {
             console.log("errore", err)
         }
     });
-
 }
 
 

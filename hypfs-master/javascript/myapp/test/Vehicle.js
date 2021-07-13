@@ -22,11 +22,7 @@ class Vehicle {
                 return paths.path5
             case 6:
                 return paths.path6
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-
+    
             default:
             // code block
         }

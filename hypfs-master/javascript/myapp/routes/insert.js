@@ -17,7 +17,7 @@ router.post('/insert', async function (req, res) {
   var message_id = await publish(point)
   console.log("POINT:", point, "MESSAGE_ID:", message_id)
 
-  
+
     //request to DHT
     make_req(encoded_point, message_id, function (data) {
       res.send({ operation: "insert", point: point, data: data })
@@ -47,13 +47,6 @@ const make_req = async function (keyword, message_id, callback) {
 
   })
 }
-
-
-
-
-
-
-
 
 
 module.exports = router;

@@ -1,10 +1,10 @@
 const { ClientBuilder } = require('@iota/client');
-const { copyFile } = require('fs');
 const config = require('../config')
 
 
-
 async function retrieve_message(message_id) {
+
+    //PRIVATE NODE
 
     /*
     // client will connect to testnet by default
@@ -14,24 +14,23 @@ async function retrieve_message(message_id) {
 
     */
 
-    //MAIN NET
+    //MAINNET
     const client = new ClientBuilder()
         .node(config.iota.URL_NODE_MAINNET)
         .localPow(config.iota.LOCAL_POW)
         .build();
 
-
+    
+    //TESTNET
 
     /*
      const client = new ClientBuilder()
-     //.node('https://iota.mywaver.it:443', {'jwt': jwt_string} )
      .node('https://api.lb-0.testnet.chrysalis2.com')
      .localPow(config.iota.LOCAL_POW)
      .build();
      */
     //client.getInfo().then(console.log).catch(console.error)
     var decodedMsg;
-
 
     await client.getMessage().data(message_id).then(data => {
 

@@ -1,10 +1,8 @@
 var paths = require('./path');
-
-
 mypath_label = ["path1", "path2", "path3", "path4", "path5", "path6"]
 mypath = [paths.path1, paths.path2, paths.path3, paths.path4, paths.path5, paths.path6]
 
-//cerco i punti in comuner tra i path
+//takes common points between the paths
 intersections = []
 for (let i = 0; i < mypath.length; i++) {
     for (let k = i + 1; k < mypath.length; k++) {
@@ -17,11 +15,9 @@ for (let i = 0; i < mypath.length; i++) {
     }
 }
 
-//metto tutti gli elementi in comune in un unico array
-intersections = intersections.flat(1); //The depth level specifying how deep a nested array structure should be flattened. Defaults to 1.
+intersections = intersections.flat(1); 
 
-//rimuovo i duplicati prima di fare inserimento  marker pothole
-
+//delete duplicates
 intersections = intersections.filter((thing, index, self) =>
     index === self.findIndex((t) => (
         t.lat === thing.lat && t.lng === thing.lng
@@ -29,7 +25,5 @@ intersections = intersections.filter((thing, index, self) =>
 )
 
 console.log("Intersezioni:", intersections)
-
-
 
 module.exports = {intersections}

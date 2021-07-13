@@ -2,15 +2,13 @@
 const Iota = require('@iota/core');
 const Mam = require('@iota/mam')
 const { trytesToAscii } = require('@iota/converter');
-
 const mode = 'public'
-const provider = 'https://nodes.devnet.iota.org'
-const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encodeURIComponent(provider)}&mode=${mode}&root=`
+const provider = 'https://nodes.mainnet.iota.org'
 
-mamState = Mam.init(provider) //forse mettere sopra se non cambia nulla
+mamState = Mam.init(provider)
 fetchData = async (root) => {
 
-   
+
 
     var fetches = []
     //Fetch data from tangle
@@ -23,7 +21,6 @@ fetchData = async (root) => {
 
         }
 
-
         // console.log(root, "-->", fetches)
     }).catch(err => {
         console.log(err)
@@ -33,5 +30,4 @@ fetchData = async (root) => {
 }
 
 module.exports = { fetchData }
-//var channelID = 'PGQWQWKOTCIX9OONLSSOTRUGFCJZQMJJGHCBVFUVODAGQOSUGNWTQOWWKGZAABIWEUAD9WWLZVLMEJRQM'
-//fetchData(channelID)
+

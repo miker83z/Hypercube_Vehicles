@@ -1,11 +1,11 @@
 var express = require('express');
 var router = express.Router();
 const request = require('request');
-const myModuleFetch = require('../MAM_services/fetch-data.js');
+const myModuleFetch = require('../MAM_services/fetch.js');
 const utils = require('../utils.js')
 const config = require('../config.js')
 
-const filepathMAM = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_fetch_MAM/retrieve.csv"
+const filepathMAM = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_fetch_MAM/retrieve_mainnet.csv"
 
 
 const NODES = 2 ** config.dht.HIPERCUBE_SIZE
@@ -14,7 +14,7 @@ var fetchMAMEndTime = 0
 
 
 router.post('/superset_search_mam', async function (req, res) {
-   
+
     point = utils.OPC_conversion_manual(req.body.point)
     threshold = req.body.threshold
     const encoded_point = utils.binToStr(utils.encode(point))
@@ -45,8 +45,6 @@ router.post('/superset_search_mam', async function (req, res) {
             fetchMAMEndTime = new Date().getTime();
             utils.write_csv(fetchMAMStartTime, fetchMAMEndTime, filepathMAM)
 
-           
-
             console.log('DONE.')
             res.send(resultFetch)
         } else {
@@ -60,10 +58,10 @@ router.post('/superset_search_mam', async function (req, res) {
 
 const make_req = async function (keyword, threshold, callback) {
 
-    const server = Math.floor(Math.random() * (NODES)) + 50000; 
-  
+    const server = Math.floor(Math.random() * (NODES)) + 50000;
+
     const options = {
-        url: 'http://127.0.0.1:'+ server+ '/superset_search',
+        url: 'http://127.0.0.1:' + server + '/superset_search',
         method: 'GET',
         qs: { 'keyword': keyword, "threshold": threshold, 'sender': 'user' },
         json: true
