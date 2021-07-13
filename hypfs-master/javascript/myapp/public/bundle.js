@@ -828,7 +828,7 @@ function decodeOLC(code) {
 global.insert_intersections = function (operation) {
     console.log("Insert intersections")
 
-    url = '/insertTestMam'
+    url = '/insertIota'
     intersections.intersections.forEach(element => {
         data = JSON.stringify({ 'lat': element.lat, "lng": element.lng })
         client_request(url, data, operation)

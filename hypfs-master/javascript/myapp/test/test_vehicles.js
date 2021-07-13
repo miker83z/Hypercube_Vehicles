@@ -64,7 +64,7 @@ function contains(markers, obj, element, tappa) {
             console.log("Tipo veicolo:", element.num_percorso, "Tappa:", tappa, "Matches:", obj)
 
             var data = JSON.stringify({ 'lat': obj.lat, "lng": obj.lng })
-            var url = "/insertTestMam"
+            var url = "/insertIota"
 
             test_request(data, url, "insert")
 
@@ -87,7 +87,7 @@ global.start_search_test = function () {
             console.log(element.coord[i], element.num_percorso)
 
             var data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
-            var url = "/superset_search_mam"
+            var url = "/superset_search_iota"
 
             test_request(data, url, "superset_search")
 
