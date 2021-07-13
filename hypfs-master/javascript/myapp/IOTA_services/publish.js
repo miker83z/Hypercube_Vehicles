@@ -11,13 +11,21 @@ function run() {
         .build();
     */
 
-
+    //MAIN NET
+      
+    const client = new ClientBuilder()
+        //.node('https://iota.mywaver.it:443', {'jwt': jwt_string} )
+        .node(config.iota.URL_NODE_MAINNET)
+        .localPow(config.iota.LOCAL_POW)
+        .build();
+    
+    /* 
     const client = new ClientBuilder()
         .primaryNode(config.iota.URL_NODE, { jwt: config.iota.KEY_JWT })
         .localPow(config.iota.LOCAL_POW) //if false Pow  done in remote
         .build();
 
-
+    */
     //client.getInfo().then(console.log).catch(console.error)
     return client
 

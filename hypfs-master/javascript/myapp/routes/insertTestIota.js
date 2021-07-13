@@ -7,6 +7,7 @@ const config = require('../config.js')
 
 const file_path_DHT = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_DHT/insert_dht_" + config.dht.HIPERCUBE_SIZE + ".csv"
 const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_"+ config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
+const file_path_mainnet = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/publish_mainnet_"+ config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
 
 
 
@@ -34,7 +35,7 @@ router.post('/insertIota', async function (req, res) {
   var message_id = await myModulePublish.publish_msg(point)
 
   publishIotaEndTime = new Date().getTime();
-  utils.write_csv(publishIotaStartTime, publishIotaEndTime, filepath)
+  utils.write_csv(publishIotaStartTime, publishIotaEndTime, file_path_mainnet)
 
 
   insertStartTime = new Date().getTime()
@@ -58,7 +59,7 @@ const make_req = async function (keyword, message_id, callback) {
   console.log("server contattato", server)
 
   console.log("INSERT IOTA DONE.")
-  //valutare se nodo casuale va anche in insert
+
   const options = {
     url: config.web.LOCAL_HOST +':' + server + '/insert',
     method: 'GET',

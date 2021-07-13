@@ -170,6 +170,187 @@ path1 = [
         "lng": 10.35058
     },
 
+    //PER HOPS
+    /*
+    
+    {
+        "lat": 32.15087,
+        "lng": -1.47333
+    },
+
+    {
+        "lat": 32.14786,
+        "lng": -1.47217
+    },
+    {
+        "lat": 51.12954,
+        "lng": 10.35181
+    },
+    {
+        "lat": 51.12947,
+        "lng": 10.35126
+    },
+
+    {
+        "lat": 51.12502,
+        "lng": 10.35352
+    },
+    {
+        "lat": 51.12505,
+        "lng": 10.35362
+    },
+    {
+        "lat": 51.12506,
+        "lng": 10.35371
+    },
+    {
+        "lat": 51.12503,
+        "lng": 10.35381
+    },
+    {
+        "lat": 51.12498,
+        "lng": 10.35385
+    },
+    {
+        "lat": 51.12492,
+        "lng": 10.35389
+    },
+    {
+        "lat": 51.12483,
+        "lng": 10.35388
+    },
+    {
+        "lat": 51.12464,
+        "lng": 10.35386
+    },
+    {
+        "lat": 51.12443,
+        "lng": 10.35373
+    },
+    {
+        "lat": 51.12435,
+        "lng": 10.35368
+    },
+    {
+        "lat": 51.12428,
+        "lng": 10.35357
+    },
+    {
+        "lat": 51.12421,
+        "lng": 10.35338
+    },
+    {
+        "lat": 51.12415,
+        "lng": 10.35307
+    },
+
+    //bolo
+
+    {
+        "lat": 44.4378,
+        "lng": 11.22261
+    },
+
+    {
+        "lat": 44.43786,
+        "lng": 11.22246
+    },
+    {
+        "lat": 51.61037,
+        "lng": -0.34227
+    },
+
+    {
+        "lat": 51.51787,
+        "lng": -0.15288
+    },
+
+    {
+        "lat": 51.1297,
+        "lng": 10.35478
+    },
+    {
+        "lat": 51.12959,
+        "lng": 10.35428
+    },
+
+    {
+        "lat": -10.65178,
+        "lng": -75.38716
+    },
+
+    {
+        "lat": 44.44746,
+        "lng": 10.94609
+    },
+    {
+        "lat": 44.44693,
+        "lng": 10.94565
+    },
+    {
+        "lat": 44.4378,
+        "lng": 11.22261
+    },
+
+    {
+        "lat": 44.43786,
+        "lng": 11.22246
+    },
+
+
+
+    {
+        "lat": 55.18017,
+        "lng": 91.31826
+    },
+
+    {
+        "lat": 55.18344,
+        "lng": 91.31881
+    },
+    {
+        "lat": 55.18358,
+        "lng": 91.31877
+    },
+    {
+        "lat": 55.18372,
+        "lng": 91.31882
+    },
+    {
+        "lat": 55.18397,
+        "lng": 91.31903
+    },
+    {
+        "lat": 55.18455,
+        "lng": 91.31955
+    },
+    {
+        "lat": 55.1852,
+        "lng": 91.32013
+    },
+    {
+        "lat": 55.1863,
+        "lng": 91.32109
+    },
+    {
+        "lat": 55.18678,
+        "lng": 91.32156
+    },
+    {
+        "lat": 55.18732,
+        "lng": 91.32211
+    },
+    {
+        "lat": 55.18849,
+        "lng": 91.32321
+    },
+    {
+        "lat": 55.19012,
+        "lng": 91.32468
+    },
+    
+*/
+
 ],
     path2 = [
 
@@ -670,6 +851,10 @@ function init_vehicles() {
     const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
     const num_vehicles = [10, 10, 10, 10, 10, 10]  //num di veicoli da create
 
+    //const pathNames = [1];    //tipologie di veicoli
+    //const num_vehicles = [1]  
+
+
     let vehicles = [];
 
     for (let i = 0; i < num_vehicles.length; i++) {
@@ -755,7 +940,7 @@ global.start_search_test = function () {
             test_request(data, url, "superset_search")
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 2*60*1000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 3*60*1000);  // call myself in 3 seconds time if required
             } else {
                 console.log("END TEST.")
             }

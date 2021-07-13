@@ -17,7 +17,7 @@ PATH_INSERT_DHT= 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascri
 PATH_IOTA_PUBLISH = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_IOTA/' # Use your path
 PATH_IOTA_RETRIEVE = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/retrieve_IOTA/' # Use your path
 PATH_MAM = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/insert_fetch_MAM/' # Use your path
-
+PATH_HOPS = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/hops/'
 
 def load_file(PATH):
     ### Fetch all files in path
@@ -126,12 +126,12 @@ def dht_stats():
     #confidence_stats(df_insert_dht)
     '''
     #SUPERSET
-    '''
+    
     df_superset_dht = load_file(PATH_SUPERSET_DHT)
     #box_plot_latency(df_superset_dht)
-    #line_plot_latency(df_superset_dht, "Superset DHT")
+    line_plot_latency(df_superset_dht, "Superset DHT")
     #confidence_stats(df_superset_dht)
-    '''
+    
 
 def compare_iota_mam():
     #INSERT PRIVATE LOCAL POW
@@ -142,27 +142,43 @@ def compare_iota_mam():
    
     df_publish_iota_public_remote_pow = pd.read_csv(PATH_IOTA_PUBLISH + 'publish_public_pow_false_node_iota.csv')
     df_publish_iota_public_local_pow = pd.read_csv(PATH_IOTA_PUBLISH + 'publish_public_pow_true_node_iota.csv')
+
+    df_publish_mainnet_iota_public_local_pow = pd.read_csv(PATH_IOTA_PUBLISH + 'publish_mainnet_public_pow_true_node_iota.csv')
+    df_publish_mainnet_iota_public_remote_pow = pd.read_csv(PATH_IOTA_PUBLISH + 'publish_mainnet_public_pow_false_node_iota.csv')
    
     df_publish_mam = pd.read_csv(PATH_MAM + 'publish.csv')
     '''
-    
+    #PRIVATE LOCAL VS REMOTE
     df_list = [df_publish_iota_private_remote_pow, df_publish_iota_private_local_pow ]
     df_labels = ["Private node remote POW","Private node local POW"]
     compare_latency(df_list, df_labels,  "Insert IOTA latency")
 
-
+    #PUBLISH LOCAL VS REMOTE
     df_list = [ df_publish_iota_public_remote_pow, df_publish_iota_public_local_pow ]
     df_labels = ["Public node remote POW", "Public node local POW"]
     compare_latency(df_list, df_labels,  "Insert IOTA latency")
 
+    #REMOTE PRIVATE VS PUBLIC VS MAM
     df_list = [df_publish_iota_private_remote_pow ,df_publish_iota_public_remote_pow, df_publish_mam]
     df_labels = ["Private node remote POW", "Public node remote POW", "MAM"]
     compare_latency(df_list, df_labels,  "Insert IOTA latency")
 
+    #LOCAL PRIVATE VS PUBLIC VS MAM
     df_list = [df_publish_iota_private_local_pow ,df_publish_iota_public_local_pow, df_publish_mam]
     df_labels = ["Private node local POW", "Public node local POW", "MAM"]
     compare_latency(df_list, df_labels,  "Insert IOTA latency")
-    '''
+   
+
+    #MAINET VS TESTNET
+    df_list = [df_publish_mainnet_iota_public_local_pow ,df_publish_iota_public_local_pow]
+    df_labels = ["Public node mainnet local POW", "Public node testenet local POW"]
+    compare_latency(df_list, df_labels,  "Insert IOTA latency")
+
+    df_list = [df_publish_mainnet_iota_public_remote_pow ,df_publish_iota_public_remote_pow]
+    df_labels = ["Public node mainnet remote POW", "Public node testenet remote POW"]
+    compare_latency(df_list, df_labels,  "Insert IOTA latency")
+     '''
+
 
     #CONF INTERVAL INSERT IOTA
     '''
@@ -176,21 +192,48 @@ def compare_iota_mam():
         print("\n")
         
     '''
+
+    
+    #CONF INTERVAL INSERT IOTA MAINNTE TESTNET
+    
+    df_latency = [df_publish_mainnet_iota_public_local_pow, df_publish_iota_public_local_pow,  df_publish_mainnet_iota_public_remote_pow, df_publish_iota_public_remote_pow  ]
+    df_labels = ["Public node mainnet local POW", "Public node testnet local POW","Public node mainnet remote POW", "Public node testnet remote POW"]
+
+    print("-------------------INSERT IOTA---------------------"+ "\n" )
+    for el, label in  zip(df_latency, df_labels):
+        print(label),
+        confidence_stats(el)
+        print("\n")
+        
+    
     
     #FETCH
+    
     df_retrieve_iota_private_remote_pow = pd.read_csv(PATH_IOTA_RETRIEVE + 'retrieve_private_pow_false_node_iota.csv')
     df_retrieve_iota_private_local_pow = pd.read_csv(PATH_IOTA_RETRIEVE + 'retrieve_private_pow_true_node_iota.csv')
 
     df_retrieve_iota_public_remote_pow = pd.read_csv(PATH_IOTA_RETRIEVE + 'retrieve_public_pow_false_node_iota.csv')
     df_retrieve_iota_public_local_pow = pd.read_csv(PATH_IOTA_RETRIEVE + 'retrieve_public_pow_true_node_iota.csv')
-   
+    
+    df_retrieve_mainnet_public = pd.read_csv(PATH_IOTA_RETRIEVE + 'retrieve_mainnet_public_pow_false_node_iota.csv')
+    
     df_retrieve_mam = pd.read_csv(PATH_MAM + 'retrieve.csv')
 
+    '''
     df_list = [df_retrieve_iota_private_local_pow ,df_retrieve_iota_public_local_pow, df_retrieve_mam]
     df_labels = ["Private node", "Public node", "MAM"]
-    compare_latency(df_list, df_labels, "Fetch IOTA latency")
+    compare_latency(df_list, df_labels, "Fetch IOTA latency") 
 
-    
+
+    #MAINET VS TESTNET
+    df_list = [df_retrieve_mainnet_public ,df_retrieve_iota_public_remote_pow ]
+    df_labels = ["Public node mainnet", "Public node testenet"]
+    compare_latency(df_list, df_labels,  "Fetch IOTA latency")
+    '''
+
+
+
+    '''
     #CONF INTERVAL FETCH IOTA
     
     df_latency = [df_retrieve_iota_private_remote_pow, df_retrieve_iota_public_remote_pow, df_retrieve_mam]
@@ -202,11 +245,29 @@ def compare_iota_mam():
         confidence_stats(el)
         print("\n")
         
+    '''
+
+
+    '''
+    #CONF INTERVAL FETCH IOTA MAINNET VS TESTNET
     
-    
+    df_latency = [df_retrieve_mainnet_public, df_retrieve_iota_public_remote_pow ]
+    df_labels = ["Mainnet",  "Testnet"]
+
+    print("-------------------FETCH IOTA---------------------"+ "\n" )
+    for el, label in  zip(df_latency, df_labels):
+        print(label),
+        confidence_stats(el)
+        print("\n")
+        
+    '''
+
+#df = load_file(PATH_HOPS)
+#hops_stats(df)
 
 compare_iota_mam()
 #dht_stats()
 
-
+#df = load_file(PATH_INSERT_DHT)
+#box_plot_latency(df)
 

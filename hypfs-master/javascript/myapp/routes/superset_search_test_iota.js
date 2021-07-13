@@ -5,7 +5,7 @@ const myModuleRequire = require('../IOTA_services/retrieve.js');
 const utils = require('../utils.js')
 const config = require('../config.js')
 
-
+const file_path_mainnet = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/retrieve_IOTA/retrieve_mainnet_"+ config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
 const filepath = "C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/retrieve_IOTA/retrieve_"+config.iota.MODE +"_pow_"+config.iota.LOCAL_POW+"_node_iota.csv"
 
 
@@ -54,7 +54,7 @@ router.post('/superset_search_iota', async function (req, res) {
 
             fetchIotaEndTime = new Date().getTime();
       
-            utils.write_csv(fetchIotaStartTime, fetchIotaEndTime, filepath)
+            utils.write_csv(fetchIotaStartTime, fetchIotaEndTime, file_path_mainnet)
       
 
             console.log('FETCH IOTA DONE.')

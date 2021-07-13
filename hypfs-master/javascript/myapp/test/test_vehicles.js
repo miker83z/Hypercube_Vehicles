@@ -11,6 +11,10 @@ function init_vehicles() {
     const pathNames = [1, 2, 3, 4, 5, 6];    //tipologie di veicoli
     const num_vehicles = [10, 10, 10, 10, 10, 10]  //num di veicoli da create
 
+    //const pathNames = [1];    //tipologie di veicoli
+    //const num_vehicles = [1]  
+
+
     let vehicles = [];
 
     for (let i = 0; i < num_vehicles.length; i++) {
@@ -96,7 +100,7 @@ global.start_search_test = function () {
             test_request(data, url, "superset_search")
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 2*60*1000);  // call myself in 3 seconds time if required
+                setTimeout(loop, 3*60*1000);  // call myself in 3 seconds time if required
             } else {
                 console.log("END TEST.")
             }
