@@ -32,7 +32,7 @@ router.post('/insertIota', async function (req, res) {
   var message_id = await myModulePublish.publish_msg(point)
 
   publishIotaEndTime = new Date().getTime();
-  utils.write_csv(publishIotaStartTime, publishIotaEndTime, file_path_mainnet)
+  //utils.write_csv(publishIotaStartTime, publishIotaEndTime, file_path_mainnet)
 
 
   insertStartTime = new Date().getTime()

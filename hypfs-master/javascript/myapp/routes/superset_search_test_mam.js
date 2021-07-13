@@ -43,7 +43,7 @@ router.post('/superset_search_mam', async function (req, res) {
 
 
             fetchMAMEndTime = new Date().getTime();
-            utils.write_csv(fetchMAMStartTime, fetchMAMEndTime, filepathMAM)
+            //utils.write_csv(fetchMAMStartTime, fetchMAMEndTime, filepathMAM)
 
             console.log('DONE.')
             res.send(resultFetch)

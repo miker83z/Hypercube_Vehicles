@@ -48,7 +48,7 @@ router.post('/superset_search_iota', async function (req, res) {
 
             fetchIotaEndTime = new Date().getTime();
 
-            utils.write_csv(fetchIotaStartTime, fetchIotaEndTime, file_path_mainnet)
+            //utils.write_csv(fetchIotaStartTime, fetchIotaEndTime, file_path_mainnet)
 
             console.log('FETCH IOTA DONE.')
             res.send({ 'data': resultFetch, "point": req.body.point })

@@ -22,11 +22,12 @@ router.post('/insertTestMam', async function (req, res) {
 
 
   publishMAMStartTime = new Date().getTime();
+  //insert point in Tangle
   var root = await execute(point)
 
   publishMAMEndTime = new Date().getTime();
 
-  utils.write_csv(publishMAMStartTime, publishMAMEndTime, filepathMam)
+  //utils.write_csv(publishMAMStartTime, publishMAMEndTime, filepathMam)
 
   //request to DHT
   make_req(encoded_point, root, function (data) {
