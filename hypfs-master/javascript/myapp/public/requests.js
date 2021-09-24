@@ -1,4 +1,4 @@
-///browserify requests.js -o bundle.js 
+//browserify requests.js -o bundle.js 
 var OpenLocationCode = require('open-location-code').OpenLocationCode
 var intersections = require('../test/intersections.js')
 
@@ -10,7 +10,8 @@ function client_request(url, data, operation) {
         contentType: 'application/json',
         data: data,
         success: function (data) {
-            console.log("success")
+            console.log("success", data)
+            
             output_data(operation, data)
 
         },

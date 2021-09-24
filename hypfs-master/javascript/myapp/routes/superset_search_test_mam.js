@@ -41,7 +41,6 @@ router.post('/superset_search_mam', async function (req, res) {
                 })
             }
 
-
             fetchMAMEndTime = new Date().getTime();
             //utils.write_csv(fetchMAMStartTime, fetchMAMEndTime, filepathMAM)
 

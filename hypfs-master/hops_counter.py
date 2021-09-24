@@ -4,8 +4,9 @@ from src.utils import *
 from openpyxl import load_workbook
 from statistics import mean
 
+
 import csv
-PATH_HOPS = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/hops/'
+PATH_HOPS = 'C:/Users/Amministratore/Desktop/IOTA_DHT/hypfs-master/javascript/myapp/test_files/hops/superset/'
 # open the file in the write mode
 
 
@@ -43,11 +44,12 @@ num_richieste = []#######
 @app.route(GET_HOPS)
 def get_hops():
     print("GET HOPS", HOPS, HYPERCUBE_SIZE)
-    
+   
     with open(PATH_HOPS + 'superset_'+ str(HYPERCUBE_SIZE) +'.csv', 'a',newline='') as f:
     # create the csv writer
         writer = csv.writer(f)
         writer.writerow([HOPS])
+        print("get hops ok")
     
     '''
     superset_hops.append(HOPS)

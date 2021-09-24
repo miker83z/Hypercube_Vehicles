@@ -5,14 +5,14 @@ const config = require('../config')
 async function retrieve_message(message_id) {
 
     //PRIVATE NODE
-
     /*
+    
     // client will connect to testnet by default
     const client = new ClientBuilder()
     .primaryNode(config.iota.URL_NODE, { jwt: config.iota.KEY_JWT })
     .build();
-
     */
+    
 
     //MAINNET
     const client = new ClientBuilder()
@@ -30,6 +30,7 @@ async function retrieve_message(message_id) {
      .build();
      */
     //client.getInfo().then(console.log).catch(console.error)
+    
     var decodedMsg;
 
     await client.getMessage().data(message_id).then(data => {

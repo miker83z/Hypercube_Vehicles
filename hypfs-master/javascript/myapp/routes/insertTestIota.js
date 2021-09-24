@@ -21,6 +21,8 @@ var publishIotaEndTime = 0
 
 router.post('/insertIota', async function (req, res) {
 
+  console.log(req.body)
+
   //convert location in OLC
   point = utils.OPC_conversion_manual(req.body)
   const encoded_point = utils.binToStr(utils.encode(point))

@@ -1,5 +1,4 @@
-//browserify test_vehicles.js -o bundle_test.js  
-//browserify C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\test\test_vehicles.js >C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\public\bundle_test.js
+ //browserify C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\test\test_vehicles.js >C:\Users\Amministratore\Desktop\IOTA_DHT\hypfs-master\javascript\myapp\public\bundle_test.js
 var Vehicle = require('./Vehicle.js')
 var intersections = require('./intersections.js')
 
@@ -11,8 +10,9 @@ function init_vehicles() {
     const pathNames = [1, 2, 3, 4, 5, 6];    //types of vehicles
     const num_vehicles = [10, 10, 10, 10, 10, 10]  //num of vehicles
 
-    //const pathNames = [1];    
-    //const num_vehicles = [1]  
+    //const pathNames = [1];    //types of vehicles
+    //const num_vehicles = [1]  //num of vehicles
+
 
     let vehicles = [];
 
@@ -43,7 +43,7 @@ global.start_insert_test = function () {
             contains(intersections.intersections, element.coord[i], element, i)
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 3*60*1000);  // call  in 3 seconds time
+                setTimeout(loop, 0.30*60*1000);  // call  in 3 seconds time
             } else {
                 console.log("END TEST.")
 
@@ -74,7 +74,10 @@ function contains(markers, obj, element, tappa) {
 }
 
 //Test start superset Search
-global.start_search_test = function () {
+global.start_search_test = function (operation) {
+
+    var url = "";
+    var data = "";
 
     vehicles = init_vehicles()
     console.log("Test search started");
@@ -86,13 +89,26 @@ global.start_search_test = function () {
 
             console.log(element.coord[i], element.num_percorso)
 
-            var data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
-            var url = "/superset_search_iota"
+            switch (operation){
+                case "pin_search":
 
-            test_request(data, url, "superset_search")
+                    data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng } })
+                    url = "/pin_search_iota"
+                    break;
+
+                case "superset_search":
+
+                    data = JSON.stringify({ 'point': { 'lat': element.coord[i].lat, "lng": element.coord[i].lng }, 'threshold': 5 })
+                    url = "/superset_search_iota"
+                    break;
+            }
+
+
+         
+            test_request(data, url, operation)
 
             if (++i < element.coord.length) {
-                setTimeout(loop, 3*60*1000);  // call in 3 seconds time if required
+                setTimeout(loop, 0.40*60*1000);  // call in 3 seconds time if required
             } else {
                 console.log("END TEST.")
             }
@@ -125,7 +141,11 @@ function test_request(data, url, operation) {
                         console.log("num messaggi:", data.data.length)
                         console.log( data.data)
 
+                    case "pin_search":
+                        console.log("num messaggi:", data.data.length)
+                        console.log( data.data)
                         break;
+
                     default:
                     // code block
                 }

@@ -22,6 +22,9 @@ var superset_search_test_mam = require('./routes/superset_search_test_mam.js')
 var superset_search_test_iota = require('./routes/superset_search_test_iota.js')
 
 var pin_search = require('./routes/pin_search.js')
+var pin_search_test_iota = require('./routes/pin_search_test_iota.js')
+
+
 var remove = require('./routes/remove.js')
 
 app.use(index);
@@ -30,6 +33,8 @@ app.use(insertTestMam);
 app.use(insertIota);
 
 app.use(pin_search);
+app.use(pin_search_test_iota);
+
 app.use(remove);
 
 app.use(superset_search);

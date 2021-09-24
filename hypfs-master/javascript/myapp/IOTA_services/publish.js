@@ -3,8 +3,7 @@ const config = require('../config')
 
 function run() {
 
-    //PRIVATE NODE
-
+    //TESTNET
     /*
     const client = new ClientBuilder()
         //.node('https://iota.mywaver.it:443', {'jwt': jwt_string} )
@@ -12,7 +11,6 @@ function run() {
         .localPow(config.iota.LOCAL_POW)
         .build();
     */
-
     //MAINNET
 
     const client = new ClientBuilder()
@@ -20,15 +18,14 @@ function run() {
         .node(config.iota.URL_NODE_MAINNET)
         .localPow(config.iota.LOCAL_POW)
         .build();
-
-    //TESTNET
-
-    /* 
+    
+    //PRIVATE NODE
+    /*
     const client = new ClientBuilder()
         .primaryNode(config.iota.URL_NODE, { jwt: config.iota.KEY_JWT })
         .localPow(config.iota.LOCAL_POW) //if false Pow  done in remote
         .build();
-
+    
     */
     //client.getInfo().then(console.log).catch(console.error)
     return client

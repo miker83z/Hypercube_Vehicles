@@ -42,6 +42,7 @@ class Node:
             return request(neighbor, REMOVE, {'keyword': str(keyword), 'obj': obj})
 
     def pin_search(self, keyword, threshold=-1):
+        print("nodo contattato", self.id)
         #bit_keyword = create_binary_id(keyword)
         bit_keyword = keyword
         if bit_keyword == self.id:

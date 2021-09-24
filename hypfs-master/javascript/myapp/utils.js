@@ -145,5 +145,11 @@ function write_csv(start_time, end_time, path) {
 
 }
 
+const P = {
+    latitude:  44.474937,
+    longitude: 11.324938
+}
+console.log(OPC_conversion(P))
+
 
 module.exports = { split_str, generate_coord, hashToBin, encode, binToStr, OPC_conversion_manual, write_csv };

@@ -5,7 +5,7 @@ const { asciiToTrytes } = require('@iota/converter')
 //MAM setup
 const mode = 'public'
 const provider = 'https://nodes.devnet.iota.org'
-//const provider = 'https://thetangle.org/nodes/'
+//const provider = 'https://thetangle.org/'
 const mamExplorerLink = `https://mam-explorer.firebaseapp.com/?provider=${encodeURIComponent(provider)}&mode=${mode}&root=`
 
 // Publish to tangle
@@ -21,11 +21,12 @@ const publish = async (packet) => {
     mamState = message.state
     console.log(message.state)
     // Attach the payload
-    await Mam.attach(message.payload,  message.address, 3, 16) //9 for devnet
+
+    await Mam.attach(message.payload,  message.address, 3, 14) //9 for devnet
 
     //console.log('Published', packet, '\n');
     //console.log('Address', message.address, '\n')
-
+    
     return message.root
 }
 
@@ -37,7 +38,6 @@ execute = async (code) => {
         timestamp: (new Date()).toLocaleString()
     });
 
-
     console.log(`Verify with MAM Explorer:\n${mamExplorerLink}${root}\n`)
     return root
 }
@@ -46,4 +46,6 @@ execute = async (code) => {
 module.exports = {
     execute: execute
 };
+
+
 
